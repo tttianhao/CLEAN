@@ -92,8 +92,7 @@ def convert_dict():
 
 if __name__ == '__main__':
     #convert_dict()
-
-    id_ec, ec_id = get_ec_id_dict('/home/tyu16/projects/PENCL/data/uniref30/uniref30_train_split_0.csv')
+    id_ec, ec_id = get_ec_id_dict('../data/uniref10_train_split_0.csv')
     single_id = set()
     single_ec = set()
     for ec in ec_id.keys():
@@ -105,4 +104,4 @@ if __name__ == '__main__':
                 single_id.add(id)
                 break
     print(len(single_id), len(single_ec))
-    mask_sequences(single_id, 'uniref30/uniref30_train_split_0', 'to_be_embed_0')
+    mask_sequences(single_id, 'uniref10_train_split_0', 'to_be_embed_0')
