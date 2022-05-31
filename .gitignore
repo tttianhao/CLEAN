@@ -9,3 +9,4 @@ data/uniref70/
 *.csv
 *.fasta
 *.npy
+*.pt
