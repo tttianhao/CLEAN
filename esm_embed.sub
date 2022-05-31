@@ -1,0 +1,14 @@
+#!/bin/bash
+#SBATCH -J esm_embed                         # Job name
+#SBATCH -o esm_embed_%j.out                  # output file (%j expands to jobID)
+#SBATCH -e esm_embed_%j.err                  # error log file (%j expands to jobID)
+#SBATCH --mail-type=ALL                      # Request status by email
+#SBATCH --mail-user=jl3789@cornell.edu        # Email address to send results to.
+#SBATCH -N 1                                 # Total number of nodes requested
+#SBATCH -n 4                                 # Total number of cores requested
+#SBATCH --get-user-env                       # retrieve the users login environment
+#SBATCH --mem=200000                           # server memory requested (per node)
+#SBATCH -t 2:00:00                           # Time limit (hh:mm:ss)
+#SBATCH --partition=default_partition      # Request partition
+#SBATCH --gres=gpu:3090:1                  # request cpu
+./scripts/esm.sh
