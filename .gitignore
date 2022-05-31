@@ -12,3 +12,5 @@ data/uniref70/
 *.pt
 *.sub
 *.sh
+*.err
+*.out
