@@ -5,7 +5,7 @@ import time
 import argparse
 import pandas as pd
 
-def get_dist_map(device, model, out_dim, file_name, dist_function):
+def get_dist_map(device, model, out_dim, file_name):
     from helper.utils import get_ec_id_dict
     from helper.dataloader import Dataset_lookup
     
@@ -45,10 +45,7 @@ def get_dist_map(device, model, out_dim, file_name, dist_function):
             current = esm_lookup[i]
             current = current.repeat(total_ec_n, 1)
             current = current.to(device)
-            if dist_function == 'hyper':
-                norm_esm = hyperbolic_dist(current, esm_lookup)
-            else:
-                norm_esm = (current - esm_lookup).norm(dim = 1, p = 2)
+            norm_esm = (current - esm_lookup).norm(dim = 1, p = 2)
             norm_esm = norm_esm.detach().cpu().numpy()
             esm_dist[ec] = {}
             for j, k in enumerate(ecs):

@@ -133,11 +133,7 @@ if __name__ == '__main__':
 
         if epoch % args.adaptive_rate == 0 and epoch != epochs + 1:
             torch.save(model.state_dict(), './model/' + model_name + '_' + str(epoch) + '.pth')
-            
-            if args.hyperbolic:
-                dist_map = get_dist_map(device, model, args.out_dim, args.model_name, 'hyper')
-            else:
-                dist_map = get_dist_map(device, model, args.out_dim, args.model_name)
+            dist_map = get_dist_map(device, model, args.out_dim, args.model_name)
             negative = mine_hard_negative(dist_map, args.knn)
             
             train_data = Dataset_with_mine_EC(id_ec, ec_id, train_set, negative)

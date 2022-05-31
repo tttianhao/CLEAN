@@ -24,10 +24,9 @@ def get_ec_id_dict(csv_name : str) -> dict:
     return id_ec, ec_id
 
 def mine_hard_negative(dist_map, knn = 10):
-    print(len(dist_map.keys()))
+    print("The number of unique EC numbers: ", len(dist_map.keys()))
     ecs = list(dist_map.keys())
     negative = {}
-    counter = 0
     for i, target in enumerate(ecs):
         sort_orders = sorted(dist_map[target].items(), key=lambda x: x[1], reverse=False)
         if sort_orders[1][1] != 0:
