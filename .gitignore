@@ -10,3 +10,5 @@ data/uniref70/
 *.fasta
 *.npy
 *.pt
+*.sub
+*.sh
