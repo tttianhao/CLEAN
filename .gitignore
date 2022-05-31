@@ -14,3 +14,4 @@ data/uniref70/
 *.sh
 *.err
 *.out
+*.pyc
