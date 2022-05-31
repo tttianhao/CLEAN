@@ -1,0 +1,12 @@
+scripts/
+output/
+model/
+ec0/
+*.swb
+*.pkl
+data/uniref30/
+data/uniref50/
+data/uniref70/
+*.csv
+*.fasta
+*.npy
