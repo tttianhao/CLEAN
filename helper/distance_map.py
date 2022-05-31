@@ -16,7 +16,7 @@ def get_dist_map(device, model, out_dim, file_name, dist_function):
     counter = 0
     cluster_center_esm = {}
     with torch.no_grad():
-        _, ec_id_dict = get_ec_id_dict('/home/tyu16/projects/PENCL/data/' + file_name + '.csv')
+        _, ec_id_dict = get_ec_id_dict('./data/' + file_name + '.csv')
         time_start = time.time()
         total_ec_n = len(ec_id_dict.keys())
         for ec in list(ec_id_dict.keys()):
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     cluster_center_esm = {}
 
     with torch.no_grad():
-        _, ec_id_dict = get_ec_id_dict('../data/' + args.train_file +'.csv')
+        _, ec_id_dict = get_ec_id_dict('./data/' + args.train_file +'.csv')
         time_start = time.time()
         total_ec_n = len(ec_id_dict.keys())
         for ec in ec_id_dict.keys():
@@ -130,4 +130,4 @@ if __name__ == '__main__':
                 print(f'|Processing {i:5d} out of {total_ec_n} |Time elapsed: {elapsed:5.2f} |')
         esm_df = pd.DataFrame.from_dict(esm_dist)
         pickle.dump(esm_dist, open('../data/distance_map/' + args.train_file + '.pkl','wb'))
-        esm_df.to_csv('../data/distance_map/' + args.train_file + '_df.csv')
+        esm_df.to_csv('./data/distance_map/' + args.train_file + '_df.csv')

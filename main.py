@@ -97,7 +97,7 @@ if __name__ == '__main__':
     params = {
         'batch_size': args.batch_size,
         'shuffle': True,
-        'num_workers': 40
+        'num_workers': 8
     }
 
     lr = args.learning_rate

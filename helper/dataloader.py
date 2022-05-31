@@ -35,7 +35,7 @@ class Dataset_lookup(torch.utils.data.Dataset):
     
     def __getitem__(self,index):
         lookup = self.lookup_list[index]
-        a = torch.load('/home/tyu16/data/esm_data/'+ lookup + '.pt')
+        a = torch.load('./data/esm_data/'+ lookup + '.pt')
         return change_format(a).double()
     
 class Dataset_with_mine_EC(torch.utils.data.Dataset):
@@ -57,7 +57,7 @@ class Dataset_with_mine_EC(torch.utils.data.Dataset):
         anchor = random.choice(self.ec_id[anchor_ec])
         pos = random_positive(anchor, self.id_ec, self.ec_id)
         neg = mine_negative(anchor, self.id_ec, self.ec_id, self.mine_neg)
-        a = torch.load('/home/tyu16/data/esm_data/' + anchor + '.pt')
-        p = torch.load('/home/tyu16/data/esm_data/' + pos + '.pt')
-        n = torch.load('/home/tyu16/data/esm_data/' + neg + '.pt')
+        a = torch.load('./data/esm_data/' + anchor + '.pt')
+        p = torch.load('./data/esm_data/' + pos + '.pt')
+        n = torch.load('./data/esm_data/' + neg + '.pt')
         return change_format(a).double(), change_format(p).double(), change_format(n).double()
