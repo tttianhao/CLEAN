@@ -1,10 +1,32 @@
 import csv
 import random
+import argparse
 import math
 import pickle
 import os
 import torch
 import numpy as np
+
+def parse():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-l', '--learning_rate', type=float, default=0.01)
+    parser.add_argument('-e', '--epoch', type=int, default=10000)
+    parser.add_argument('-n', '--model_name', type=str,
+                        default='default_model')
+    parser.add_argument('-d', '--hidden_dim', type=int, default=512)
+    parser.add_argument('-k', '--knn', type=int, default=10)
+    parser.add_argument('-o', '--out_dim', type=int, default=128)
+    parser.add_argument('-b', '--batch_size', type=int, default=2720)
+    parser.add_argument('-c', '--check_point', type=str, default='no')
+    parser.add_argument('-m', '--margin', type=float, default=1)
+    parser.add_argument('--adaptive_rate', type=int, default=100)
+    parser.add_argument('--log_interval', type=int, default=1)
+    parser.add_argument('--hyperbolic', type=bool, default=False)
+    parser.add_argument('--high_precision', type=bool, default=False)
+    parser.add_argument('--verbose', type=bool, default=False)
+    args = parser.parse_args()
+    return args
+
 
 def get_ec_id_dict(csv_name : str) -> dict:
     csv_file = open(csv_name)

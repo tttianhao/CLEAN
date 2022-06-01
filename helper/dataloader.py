@@ -40,7 +40,7 @@ class Dataset_lookup(torch.utils.data.Dataset):
     
 class Dataset_with_mine_EC(torch.utils.data.Dataset):
 
-    def __init__(self, id_ec, ec_id, full_list, mine_neg):
+    def __init__(self, id_ec, ec_id, mine_neg):
         self.id_ec = id_ec
         self.ec_id = ec_id
         self.full_list = []
