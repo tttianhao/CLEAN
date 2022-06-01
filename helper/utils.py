@@ -21,12 +21,17 @@ def parse():
     parser.add_argument('-m', '--margin', type=float, default=1)
     parser.add_argument('--adaptive_rate', type=int, default=100)
     parser.add_argument('--log_interval', type=int, default=1)
-    parser.add_argument('--hyperbolic', type=bool, default=False)
     parser.add_argument('--high_precision', type=bool, default=False)
     parser.add_argument('--verbose', type=bool, default=False)
     args = parser.parse_args()
     return args
 
+def seed_everything(seed=1234):
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
 
 def get_ec_id_dict(csv_name : str) -> dict:
     csv_file = open(csv_name)
@@ -70,59 +75,3 @@ def mine_hard_negative(dist_map, knn = 10):
             'negative' : neg_ecs
         }
     return negative
-
-def mutate(seq: str, position: int) -> str:
-    seql = seq[ : position]
-    seqr = seq[position+1 : ]
-    seq = seql + '*' + seqr
-    return seq
-
-def mask_sequences(single_id: list, csv_name: str, fasta_name: str) -> None:
-    csv_file = open('../data/'+ csv_name + '.csv')
-    csvreader = csv.reader(csv_file, delimiter = '\t')
-    output_fasta = open('../data/' + fasta_name + '.fasta','w')
-    single_id = set(single_id)
-    for i, rows in enumerate(csvreader):
-        if rows[0] in single_id:
-            for j in range(10):
-                seq = rows[2].strip()
-                mu, sigma = .10, .02 # mean and standard deviation
-                s = np.random.normal(mu, sigma, 1)
-                mut_rate = s[0]
-                times = math.ceil(len(seq) * mut_rate)
-                for k in range(times):
-                    position = random.randint(1 , len(seq) - 1)
-                    seq = mutate(seq, position)
-                seq = seq.replace('*', '<mask>')
-                output_fasta.write('>' + rows[0] + '_' + str(j) + '\n')
-                output_fasta.write(seq + '\n')
-
-def convert_dict():
-    dir_path = '/home/tianhao/project/EC_pred/esm_data/'
-    counter = 0
-    for files in os.listdir(dir_path):
-        counter += 1
-        if files.endswith('.pt'):
-            esm = torch.load(dir_path + files)
-            if type(esm) == dict:
-                esm = esm['mean_representations'][33]
-                assert(type(esm) == torch.Tensor)
-                torch.save(esm, dir_path + files)
-        if counter % 100000 == 0:
-            print(counter)  
-
-if __name__ == '__main__':
-    #convert_dict()
-    id_ec, ec_id = get_ec_id_dict('../data/uniref10_train_split_0.csv')
-    single_id = set()
-    single_ec = set()
-    for ec in ec_id.keys():
-        if len(ec_id[ec]) == 1:
-            single_ec.add(ec)
-    for id in id_ec.keys():
-        for ec in id_ec[id]:
-            if ec in single_ec:
-                single_id.add(id)
-                break
-    print(len(single_id), len(single_ec))
-    mask_sequences(single_id, 'uniref10_train_split_0', 'to_be_embed_0')

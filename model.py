@@ -11,7 +11,7 @@ class Net(nn.Module):
         self.drop_out = drop_out
         self.device = device
         self.dtype = dtype
-
+        
         self.fc1 = nn.Linear(1280, hidden_dim, dtype=dtype, device=device)
         self.fc2 = nn.Linear(hidden_dim, out_dim, dtype=dtype, device=device)
         self.dropout = nn.Dropout(p=drop_out)

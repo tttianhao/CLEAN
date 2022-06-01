@@ -28,8 +28,8 @@ def get_dist_map(out_dim, file_name, model=None):
                     valid_data, **params)
                 for i, data in enumerate(valid_loader):
                     if model != None:
-                        lookup = model(
-                            data.to(device=model.device, dtype=model.dtype))
+                        data = data.to(device=model.device, dtype=model.dtype)
+                        lookup = model(data)
                     esm = torch.mean(lookup, dim=0)
                     cluster_center_esm[ec] = esm.detach().cpu()
                 if counter % 10 == 0:
@@ -62,14 +62,7 @@ def get_dist_map(out_dim, file_name, model=None):
         return esm_dist
 
 
-def hyperbolic_dist(u, v):
-    sqdist = torch.sum((u - v) ** 2, dim=-1)
-    squnorm = torch.sum(u ** 2, dim=-1)
-    sqvnorm = torch.sum(v ** 2, dim=-1)
-    x = 1 + 2 * sqdist / ((1 - squnorm) * (1 - sqvnorm)) + 1e-7
-    z = torch.sqrt(x ** 2 - 1)
-    return torch.log(x + z)
-
+ 
 
 if __name__ == '__main__':
     from utils import get_ec_id_dict
@@ -122,10 +115,7 @@ if __name__ == '__main__':
             current = esm_lookup[i]
             current = current.repeat(total_ec_n, 1)
             current = current.to(device)
-            if args.hyper:
-                norm_esm = hyperbolic_dist(current, esm_lookup)
-            else:
-                norm_esm = (current - esm_lookup).norm(dim=1, p=2)
+            norm_esm = (current - esm_lookup).norm(dim=1, p=2)
             norm_esm = norm_esm.detach().cpu().numpy()
             esm_dist[ec] = {}
             for j, k in enumerate(ecs):

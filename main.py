@@ -1,12 +1,23 @@
 import torch
-
 import time
 import pickle
 from helper.dataloader import Dataset_with_mine_EC
 from model import Net
-from helper.utils import get_ec_id_dict, mine_hard_negative, parse
+from helper.utils import get_ec_id_dict, mine_hard_negative, parse, seed_everything
 import torch.nn as nn
 from helper.distance_map import get_dist_map
+
+
+def get_dataloader(dist_map, id_ec, ec_id, args):
+    params = {
+        'batch_size': args.batch_size,
+        'shuffle': True,
+        'num_workers': 8
+    }
+    negative = mine_hard_negative(dist_map, args.knn)
+    train_data = Dataset_with_mine_EC(id_ec, ec_id, negative)
+    train_loader = torch.utils.data.DataLoader(train_data, **params)
+    return train_loader
 
 
 def train(model: nn.Module, args) -> None:
@@ -35,10 +46,12 @@ def train(model: nn.Module, args) -> None:
                   f'lr {lr:02.4f} | ms/batch {ms_per_batch:5.2f} | '
                   f'loss {cur_loss:5.2f}')
             start_time = time.time()
+    # record running average training loss
     return total_loss/(batch + 1)
 
 
 if __name__ == '__main__':
+    seed_everything(1234)
     args = parse()
     torch.backends.cudnn.benchmark = True
     # get train set, test set is only used during evaluation
@@ -47,27 +60,17 @@ if __name__ == '__main__':
     ec_id = {}
     for key in ec_id_dict.keys():
         ec_id[key] = list(ec_id_dict[key])
+    #======================== override args ====================#
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda:0" if use_cuda else "cpu")
-    if args.high_precision:
-        dtype = torch.float64
-    else:
-        dtype = torch.float32
-    print('device used: ', device, '; dtype used: ', dtype, "; args", args)
+    dtype = torch.float64 if args.high_precision else torch.float32
+    lr, epochs = args.learning_rate, args.epoch
+    model_name, log_interval = args.model_name, args.log_interval
+    print('==> device used:', device, '| dtype used: ',
+          dtype, "\n ==> args:", args)
 
-    params = {
-        'batch_size': args.batch_size,
-        'shuffle': True,
-        'num_workers': 8
-    }
-
-    lr = args.learning_rate
-    epochs = args.epoch
-    model_name = args.model_name
-    log_interval = args.log_interval
-
+    #======================== initialize model =================#
     model = Net(args.hidden_dim, args.out_dim, device, dtype)
-
     if args.check_point != 'no':
         checkpoint = torch.load('./model/' + args.check_point+'.pth')
         model.load_state_dict(checkpoint)
@@ -80,35 +83,32 @@ if __name__ == '__main__':
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     criterion = nn.TripletMarginLoss(margin=args.margin, reduction='mean')
     best_loss = float('inf')
+    train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
 
-    negative = mine_hard_negative(dist_map, args.knn)
-    train_data = Dataset_with_mine_EC(id_ec, ec_id, negative)
-    train_loader = torch.utils.data.DataLoader(train_data, **params)
-
+    #======================== training =======-=================#
     for epoch in range(1, epochs + 1):
-
         if epoch % args.adaptive_rate == 0 and epoch != epochs + 1:
             torch.save(model.state_dict(), './model/' +
                        model_name + '_' + str(epoch) + '.pth')
+            # sample new distance map
             dist_map = get_dist_map(args.out_dim, args.model_name, model=model)
-            negative = mine_hard_negative(dist_map, args.knn)
-            train_data = Dataset_with_mine_EC(
-                id_ec, ec_id, train_set, negative)
-            train_loader = torch.utils.data.DataLoader(train_data, **params)
+            train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
             pickle.dump(dist_map, open('./data/distance_map/' +
                         model_name + '_' + str(epoch) + '.pkl', 'wb'))
 
         epoch_start_time = time.time()
         train_loss = train(model, args)
 
+        # only save the current best model near the end of training
+        if (train_loss < best_loss and epoch > 0.8*epochs):
+            torch.save(model.state_dict(), './model/' + model_name + '.pth')
+            best_loss = train_loss
+            print(f'Best from epoch : {epoch:3d}; loss: {train_loss:5.2f}')
+
         elapsed = time.time() - epoch_start_time
         print('-' * 75)
         print(f'| end of epoch {epoch:3d} | time: {elapsed:5.2f}s | '
               f'training loss {train_loss:5.2f}')
         print('-' * 75)
-        if (train_loss < best_loss and epoch > 0.5*epochs):
-            torch.save(model.state_dict(), './model/' + model_name + '.pth')
-            best_loss = train_loss
-            print(f'Best from epoch : {epoch:3d}; loss: {train_loss:5.2f}')
 
     torch.save(model.state_dict(), './model/' + model_name + '_final.pth')

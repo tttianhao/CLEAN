@@ -21,7 +21,7 @@ def random_positive(id, id_ec, ec_id):
         pos = random.choice(ec_id[pos_ec])
     return pos
 
-def change_format(a):
+def format(a):
     if type(a) == dict:
         a = a['mean_representations'][33]
     return a
@@ -36,7 +36,7 @@ class Dataset_lookup(torch.utils.data.Dataset):
     def __getitem__(self,index):
         lookup = self.lookup_list[index]
         a = torch.load('./data/esm_data/'+ lookup + '.pt')
-        return change_format(a).double()
+        return format(a) 
     
 class Dataset_with_mine_EC(torch.utils.data.Dataset):
 
@@ -60,4 +60,4 @@ class Dataset_with_mine_EC(torch.utils.data.Dataset):
         a = torch.load('./data/esm_data/' + anchor + '.pt')
         p = torch.load('./data/esm_data/' + pos + '.pt')
         n = torch.load('./data/esm_data/' + neg + '.pt')
-        return change_format(a).double(), change_format(p).double(), change_format(n).double()
+        return format(a), format(p), format(n) 
