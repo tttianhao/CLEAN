@@ -20,7 +20,7 @@ def get_dataloader(dist_map, id_ec, ec_id, args):
     return train_loader
 
 
-def train(model: nn.Module, args) -> None:
+def train(model, args, epoch, train_loader, optimizer, device, dtype, criterion):
     model.train()
     total_loss = 0.
     start_time = time.time()
@@ -43,32 +43,27 @@ def train(model: nn.Module, args) -> None:
                 1000 / args.log_interval
             cur_loss = total_loss / args.log_interval
             print(f'| epoch {epoch:3d} | {batch:5d}/{len(train_loader):5d} batches | '
-                  f'lr {lr:02.4f} | ms/batch {ms_per_batch:5.2f} | '
+                  f'lr {lr:02.4f} | ms/batch {ms_per_batch:6.4f} | '
                   f'loss {cur_loss:5.2f}')
             start_time = time.time()
     # record running average training loss
     return total_loss/(batch + 1)
 
 
-if __name__ == '__main__':
+def main():
     seed_everything(1234)
     args = parse()
     torch.backends.cudnn.benchmark = True
     # get train set, test set is only used during evaluation
     id_ec, ec_id_dict = get_ec_id_dict('./data/' + args.model_name + '.csv')
-    train_set = list(id_ec.keys())
-    ec_id = {}
-    for key in ec_id_dict.keys():
-        ec_id[key] = list(ec_id_dict[key])
+    ec_id = {key: list(ec_id_dict[key]) for key in ec_id_dict.keys()}
     #======================== override args ====================#
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda:0" if use_cuda else "cpu")
     dtype = torch.float64 if args.high_precision else torch.float32
-    lr, epochs = args.learning_rate, args.epoch
-    model_name, log_interval = args.model_name, args.log_interval
+    lr, epochs, model_name = args.learning_rate, args.epoch, args.model_name 
     print('==> device used:', device, '| dtype used: ',
-          dtype, "\n ==> args:", args)
-
+          dtype, "\n==> args:", args)
     #======================== initialize model =================#
     model = Net(args.hidden_dim, args.out_dim, device, dtype)
     if args.check_point != 'no':
@@ -97,18 +92,23 @@ if __name__ == '__main__':
                         model_name + '_' + str(epoch) + '.pkl', 'wb'))
 
         epoch_start_time = time.time()
-        train_loss = train(model, args)
+        train_loss = train(model, args, epoch, train_loader,
+                           optimizer, device, dtype, criterion)
 
         # only save the current best model near the end of training
         if (train_loss < best_loss and epoch > 0.8*epochs):
             torch.save(model.state_dict(), './model/' + model_name + '.pth')
             best_loss = train_loss
-            print(f'Best from epoch : {epoch:3d}; loss: {train_loss:5.2f}')
+            print(f'Best from epoch : {epoch:3d}; loss: {train_loss:6.4f}')
 
         elapsed = time.time() - epoch_start_time
         print('-' * 75)
         print(f'| end of epoch {epoch:3d} | time: {elapsed:5.2f}s | '
-              f'training loss {train_loss:5.2f}')
+              f'training loss {train_loss:6.4f}')
         print('-' * 75)
 
     torch.save(model.state_dict(), './model/' + model_name + '_final.pth')
+
+
+if __name__ == '__main__':
+    main()
