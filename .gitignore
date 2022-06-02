@@ -8,6 +8,7 @@ data/uniref30/
 data/uniref50/
 data/uniref70/
 data/
+out/
 *.csv
 *.fasta
 *.npy
