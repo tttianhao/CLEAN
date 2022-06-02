@@ -18,8 +18,8 @@ def get_esm_dist():
     esm_emb = esm_embedding(ec_id_dict, device, dtype)
     esm_dist = get_dist_map(ec_id_dict, esm_emb, device, dtype)
     esm_df = pd.DataFrame.from_dict(esm_dist)
-    pickle.dump(esm_dist, open('./data/distance_map/' +
-                args.train_file + '.pkl', 'wb'))
+    # pickle.dump(esm_dist, open('./data/distance_map/' +
+    #             args.train_file + '.pkl', 'wb'))
     esm_df.to_csv('./data/distance_map/' + args.train_file + '_df.csv')
 
 

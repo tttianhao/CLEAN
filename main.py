@@ -68,11 +68,9 @@ def main():
     if args.check_point != 'no':
         checkpoint = torch.load('./model/' + args.check_point+'.pth')
         model.load_state_dict(checkpoint)
-        dist_map = pickle.load(
-            open('./data/distance_map/uniref30_700.pkl', 'rb'))
+        dist_map = pickle.load(open('./data/distance_map/uniref30_700.pkl', 'rb'))
     else:
-        dist_map = pickle.load(
-            open('./data/distance_map/' + args.model_name + '.pkl', 'rb'))
+        dist_map = pickle.load(open('./data/distance_map/' + args.model_name + '.pkl', 'rb'))
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     criterion = nn.TripletMarginLoss(margin=args.margin, reduction='mean')
@@ -93,7 +91,6 @@ def main():
             train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
             pickle.dump(dist_map, open('./data/distance_map/' +
                         model_name + '_' + str(epoch) + '.pkl', 'wb'))
-
         epoch_start_time = time.time()
         train_loss = train(model, args, epoch, train_loader,
                            optimizer, device, dtype, criterion)
@@ -109,7 +106,6 @@ def main():
         print(f'| end of epoch {epoch:3d} | time: {elapsed:5.2f}s | '
               f'training loss {train_loss:6.4f}')
         print('-' * 75)
-
     torch.save(model.state_dict(), './model/' + model_name + '_final.pth')
 
 

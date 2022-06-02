@@ -5,7 +5,7 @@ from tqdm import tqdm
 def get_dist_map(ec_id_dict, esm_emb, device, dtype, model=None):
     cluster_center_model = {}
     # inference all queries at once to get model embedding
-    if model != None:
+    if model is not None:
         model_emb = model(esm_emb.to(device=device, dtype=dtype))
     else:
         # the first distance map before training comes from ESM
