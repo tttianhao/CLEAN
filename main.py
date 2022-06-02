@@ -1,5 +1,6 @@
 import torch
 import time
+import os
 import pickle
 from helper.dataloader import Dataset_with_mine_EC
 from model import Net
@@ -54,7 +55,10 @@ def main():
     args = parse()
     torch.backends.cudnn.benchmark = True
     # get train set, test set is only used during evaluation
-    id_ec, ec_id_dict = get_ec_id_dict('./data/' + args.model_name + '.csv')
+    if args.training_data is None:
+        id_ec, ec_id_dict = get_ec_id_dict('./data/' + args.model_name + '.csv')
+    else:
+        id_ec, ec_id_dict = get_ec_id_dict('./data/' + args.training_data + '.csv')
     ec_id = {key: list(ec_id_dict[key]) for key in ec_id_dict.keys()}
     #======================== override args ====================#
     use_cuda = torch.cuda.is_available()
@@ -70,7 +74,10 @@ def main():
         model.load_state_dict(checkpoint)
         dist_map = pickle.load(open('./data/distance_map/uniref30_700.pkl', 'rb'))
     else:
-        dist_map = pickle.load(open('./data/distance_map/' + args.model_name + '.pkl', 'rb'))
+        if args.training_data is None:
+            dist_map = pickle.load(open('./data/distance_map/' + args.model_name + '.pkl', 'rb'))
+        else:
+            dist_map = pickle.load(open('./data/distance_map/' + args.training_data + '.pkl', 'rb'))
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     criterion = nn.TripletMarginLoss(margin=args.margin, reduction='mean')
@@ -79,7 +86,12 @@ def main():
 
     #======================== training =======-=================#
     # loading ESM embedding for dist map
-    esm_emb = esm_embedding(ec_id_dict, device, dtype)
+    if os.path.exists('./data/distance_map/' + model_name + '_esm_dist.pkl'):
+        esm_emb = pickle.load(
+            open('./data/distance_map/' + model_name + '_esm_dist.pkl', 'rb')).to(device=device, dtype=dtype)
+    else:
+        esm_emb = esm_embedding(ec_id_dict, device, dtype)
+        pickle.dump(esm_emb, open('./data/distance_map/' + model_name + '_esm_dist.pkl', 'wb'))
     # training
     for epoch in range(1, epochs + 1):
         if epoch % args.adaptive_rate == 0 and epoch != epochs + 1:

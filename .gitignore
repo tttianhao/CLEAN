@@ -3,9 +3,11 @@ model/
 ec0/
 *.swb
 *.pkl
+data/uniref10/
 data/uniref30/
 data/uniref50/
 data/uniref70/
+data/
 *.csv
 *.fasta
 *.npy
