@@ -18,3 +18,4 @@ out/
 *.err
 *.out
 *.pyc
+!eval
