@@ -1,5 +1,6 @@
 import torch
 import random
+from helper.utils import format
 
 def mine_negative(anchor, id_ec, ec_id, mine_neg):
     anchor_ec = id_ec[anchor]
@@ -20,11 +21,6 @@ def random_positive(id, id_ec, ec_id):
     while pos == id:
         pos = random.choice(ec_id[pos_ec])
     return pos
-
-def format(a):
-    if type(a) == dict:
-        a = a['mean_representations'][33]
-    return a
 
 class Dataset_lookup(torch.utils.data.Dataset):
     def __init__(self, lookup_list):

@@ -7,6 +7,7 @@ import os
 import torch
 import numpy as np
 
+
 def parse():
     parser = argparse.ArgumentParser()
     parser.add_argument('-l', '--learning_rate', type=float, default=0.01)
@@ -26,6 +27,7 @@ def parse():
     args = parser.parse_args()
     return args
 
+
 def seed_everything(seed=1234):
     random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
@@ -33,13 +35,14 @@ def seed_everything(seed=1234):
     torch.cuda.manual_seed(seed)
     torch.backends.cudnn.deterministic = True
 
-def get_ec_id_dict(csv_name : str) -> dict:
+
+def get_ec_id_dict(csv_name: str) -> dict:
     csv_file = open(csv_name)
-    csvreader = csv.reader(csv_file, delimiter = '\t')
+    csvreader = csv.reader(csv_file, delimiter='\t')
     id_ec = {}
     ec_id = {}
 
-    for i,rows in enumerate(csvreader):
+    for i, rows in enumerate(csvreader):
         if i > 0:
             id_ec[rows[0]] = rows[1].split(';')
             for ec in rows[1].split(';'):
@@ -50,12 +53,14 @@ def get_ec_id_dict(csv_name : str) -> dict:
                     ec_id[ec].add(rows[0])
     return id_ec, ec_id
 
-def mine_hard_negative(dist_map, knn = 10):
+
+def mine_hard_negative(dist_map, knn=10):
     print("The number of unique EC numbers: ", len(dist_map.keys()))
     ecs = list(dist_map.keys())
     negative = {}
     for i, target in enumerate(ecs):
-        sort_orders = sorted(dist_map[target].items(), key=lambda x: x[1], reverse=False)
+        sort_orders = sorted(
+            dist_map[target].items(), key=lambda x: x[1], reverse=False)
         if sort_orders[1][1] != 0:
             freq = [1/i[1] for i in sort_orders[1:1 + knn]]
             neg_ecs = [i[0] for i in sort_orders[1:1 + knn]]
@@ -71,7 +76,26 @@ def mine_hard_negative(dist_map, knn = 10):
 
         normalized_freq = [i/sum(freq) for i in freq]
         negative[target] = {
-            'weights' : normalized_freq,
-            'negative' : neg_ecs
+            'weights': normalized_freq,
+            'negative': neg_ecs
         }
     return negative
+
+
+def format(a):
+    if type(a) == dict:
+        a = a['mean_representations'][33]
+    return a
+
+
+def esm_embedding(ec_id_dict, device, dtype):
+    def load_esm(lookup):
+        esm = format(torch.load('./data/esm_data/' + lookup + '.pt'))
+        return esm.unsqueeze(0)
+
+    esm_emb = []
+    for ec in list(ec_id_dict.keys()):
+        ids_for_query = list(ec_id_dict[ec])
+        esm_to_cat = [load_esm(id) for id in ids_for_query]
+        esm_emb = esm_emb + esm_to_cat
+    return torch.cat(esm_emb).to(device=device, dtype=dtype)

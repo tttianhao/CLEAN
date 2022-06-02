@@ -3,7 +3,7 @@ import time
 import pickle
 from helper.dataloader import Dataset_with_mine_EC
 from model import Net
-from helper.utils import get_ec_id_dict, mine_hard_negative, parse, seed_everything
+from helper.utils import *
 import torch.nn as nn
 from helper.distance_map import get_dist_map
 
@@ -12,7 +12,6 @@ def get_dataloader(dist_map, id_ec, ec_id, args):
     params = {
         'batch_size': args.batch_size,
         'shuffle': True,
-        'num_workers': 8
     }
     negative = mine_hard_negative(dist_map, args.knn)
     train_data = Dataset_with_mine_EC(id_ec, ec_id, negative)
@@ -61,7 +60,7 @@ def main():
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda:0" if use_cuda else "cpu")
     dtype = torch.float64 if args.high_precision else torch.float32
-    lr, epochs, model_name = args.learning_rate, args.epoch, args.model_name 
+    lr, epochs, model_name = args.learning_rate, args.epoch, args.model_name
     print('==> device used:', device, '| dtype used: ',
           dtype, "\n==> args:", args)
     #======================== initialize model =================#
@@ -81,12 +80,16 @@ def main():
     train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
 
     #======================== training =======-=================#
+    # loading ESM embedding for dist map
+    esm_emb = esm_embedding(ec_id_dict, device, dtype)
+    # training
     for epoch in range(1, epochs + 1):
         if epoch % args.adaptive_rate == 0 and epoch != epochs + 1:
             torch.save(model.state_dict(), './model/' +
                        model_name + '_' + str(epoch) + '.pth')
             # sample new distance map
-            dist_map = get_dist_map(args.out_dim, args.model_name, model=model)
+            dist_map = get_dist_map(
+                ec_id_dict, esm_emb, device, dtype, model=model)
             train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
             pickle.dump(dist_map, open('./data/distance_map/' +
                         model_name + '_' + str(epoch) + '.pkl', 'wb'))
