@@ -1,12 +1,13 @@
+# Warning: this script is meant to be ran in the root directory!!!
+import sys
+sys.path.append('./')
 import csv
 import random
-import argparse
 import math
-import pickle
 import os
 import torch
 import numpy as np
-from utils import *
+from helper.utils import *
 
 def mutate(seq: str, position: int) -> str:
     seql = seq[ : position]
@@ -15,9 +16,9 @@ def mutate(seq: str, position: int) -> str:
     return seq
 
 def mask_sequences(single_id: list, csv_name: str, fasta_name: str) -> None:
-    csv_file = open('../data/'+ csv_name + '.csv')
+    csv_file = open('./data/'+ csv_name + '.csv')
     csvreader = csv.reader(csv_file, delimiter = '\t')
-    output_fasta = open('../data/' + fasta_name + '.fasta','w')
+    output_fasta = open('./data/fasta/' + fasta_name + '.fasta','w')
     single_id = set(single_id)
     for i, rows in enumerate(csvreader):
         if rows[0] in single_id:
@@ -48,9 +49,9 @@ def convert_dict():
         if counter % 100000 == 0:
             print(counter)  
 
-if __name__ == '__main__':
+def main():
     #convert_dict()
-    id_ec, ec_id = get_ec_id_dict('../data/uniref10_train_split_0.csv')
+    id_ec, ec_id = get_ec_id_dict('./data/uniref10_train_split_0.csv')
     single_id = set()
     single_ec = set()
     for ec in ec_id.keys():
@@ -62,4 +63,7 @@ if __name__ == '__main__':
                 single_id.add(id)
                 break
     print(len(single_id), len(single_ec))
-    mask_sequences(single_id, 'uniref10_train_split_0', 'to_be_embed_0')
+    mask_sequences(single_id, 'uniref10_train_split_0', 'to_be_embed_esm_0')
+
+if __name__ == '__main__':
+    main()

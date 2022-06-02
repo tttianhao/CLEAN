@@ -21,18 +21,6 @@ def random_positive(id, id_ec, ec_id):
     while pos == id:
         pos = random.choice(ec_id[pos_ec])
     return pos
-
-class Dataset_lookup(torch.utils.data.Dataset):
-    def __init__(self, lookup_list):
-        self.lookup_list = lookup_list
-    
-    def __len__(self):
-        return len(self.lookup_list)
-    
-    def __getitem__(self,index):
-        lookup = self.lookup_list[index]
-        a = torch.load('./data/esm_data/'+ lookup + '.pt')
-        return format(a) 
     
 class Dataset_with_mine_EC(torch.utils.data.Dataset):
 

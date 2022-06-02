@@ -1,3 +1,5 @@
+## TODO: Clean this
+
 import os
 import csv
 import random
