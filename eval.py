@@ -1,7 +1,4 @@
-import pickle
 import torch
-import pickle
-from tqdm import tqdm
 from model import Net
 from helper.utils import *
 from helper.distance_map import *
@@ -19,6 +16,20 @@ def eval_parse():
     parser.add_argument('--high_precision', type=bool, default=False)
     args = parser.parse_args()
     return args
+
+def write_top10_choices(df, csv_name):
+    out_file = open(csv_name + '_top10.csv', 'w')
+    csvwriter = csv.writer(out_file, delimiter=',')
+    for col in df.columns:
+        ec = []
+        for i in range(10):
+            cur = df[col].nsmallest(10).index[i]
+            dist = df[col].nsmallest(10)[i]
+            dist_str = "{:.4f}".format(dist)
+            ec.append('EC:' + str(cur) + '/' + dist_str)
+        ec.insert(0, col)
+        csvwriter.writerow(ec)
+    return
 
 
 def main():
@@ -42,7 +53,9 @@ def main():
     eval_dist = get_dist_map_test(
         emb_train, emb_test, ec_id_dict_train, id_ec_test, device, dtype)
     eval_df = pd.DataFrame.from_dict(eval_dist)
-    eval_df.to_csv('./eval/distmap_' + args.test_data + '.csv')
+    # write the top 10 closest EC to _top10.csv
+    out_filename = './eval/distmap_' + args.test_data
+    write_top10_choices(eval_df, out_filename)
     return
 
 
