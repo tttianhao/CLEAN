@@ -3,7 +3,7 @@ import time
 import os
 import pickle
 from helper.dataloader import Dataset_with_mine_EC
-from model import Net
+from helper.model import Net
 from helper.utils import *
 import torch.nn as nn
 from helper.distance_map import get_dist_map

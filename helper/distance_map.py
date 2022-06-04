@@ -16,6 +16,18 @@ def get_cluster_center(model_emb, ec_id_dict):
     return cluster_center_model
 
 
+def dist_map_helper(keys1, lookup1, keys2, lookup2):
+    dist = {}
+    for i, key1 in tqdm(enumerate(keys1)):
+        current = lookup1[i].unsqueeze(0)
+        dist_norm = (current - lookup2).norm(dim=1, p=2)
+        dist_norm = dist_norm.detach().cpu().numpy()
+        dist[key1] = {}
+        for j, key2 in enumerate(keys2):
+            dist[key1][key2] = dist_norm[j]
+    return dist
+
+
 def get_dist_map(ec_id_dict, esm_emb, device, dtype, model=None):
     '''
     Get the distance map for training, size of (N_EC_train, N_EC_train)
@@ -37,15 +49,8 @@ def get_dist_map(ec_id_dict, esm_emb, device, dtype, model=None):
         model_lookup[i] = cluster_center_model[ec]
     model_lookup = model_lookup.to(device=device, dtype=dtype)
     # calculate pairwise distance map between total_ec_n * total_ec_n pairs
-    model_dist = {}
     print(f'Calculating distance map, number of unique EC is {total_ec_n}')
-    for i, ec in tqdm(enumerate(ecs)):
-        current = model_lookup[i].unsqueeze(0)
-        dist_norm = (current - model_lookup).norm(dim=1, p=2)
-        dist_norm = dist_norm.detach().cpu().numpy()
-        model_dist[ec] = {}
-        for j, ec_prime in enumerate(ecs):
-            model_dist[ec][ec_prime] = dist_norm[j]
+    model_dist = dist_map_helper(ecs, model_lookup, ecs, model_lookup)
     return model_dist
 
 
@@ -68,17 +73,28 @@ def get_dist_map_test(model_emb_train, model_emb_test,
         model_lookup[i] = cluster_center_model[ec]
     model_lookup = model_lookup.to(device=device, dtype=dtype)
     # calculate distance map between n_query_test * total_ec_n (training) pairs
-    query_dist = {}
     ids = list(id_ec_test.keys())
     print(f'Calculating eval distance map, between {len(ids)} test ids '
           f'and {total_ec_n} train EC cluster centers')
-    eval_dist = {}
-    for i, id in tqdm(enumerate(ids)):
-        id_embedding = model_emb_test[i]
-        dist_norm = (id_embedding - model_lookup).norm(dim=1, p=2)
-        dist_norm = dist_norm.detach().cpu().numpy()
-        eval_dist[id] = {}
-        for j, ec in enumerate(ecs):
-            eval_dist[id][ec] = dist_norm[j]
-    return eval_dist        
-    
+    eval_dist = dist_map_helper(ids, model_emb_test, ecs, model_lookup)
+    return eval_dist
+
+
+def get_random_nk_dist_map(emb_train, rand_nk_emb_train,
+                           ec_id_dict_train, rand_nk_ids,
+                           device, dtype):
+    '''
+    Get the pair-wise distance map between 
+    randomly chosen nk ids from training and all EC cluster centers 
+    map is of size of (nk, N_EC_train)
+    '''
+    cluster_center_model = get_cluster_center(emb_train, ec_id_dict_train)
+    total_ec_n, out_dim = len(ec_id_dict_train.keys()), emb_train.size(1)
+    model_lookup = torch.zeros(total_ec_n, out_dim, device=device, dtype=dtype)
+    ecs = list(cluster_center_model.keys())
+    for i, ec in enumerate(ecs):
+        model_lookup[i] = cluster_center_model[ec]
+    model_lookup = model_lookup.to(device=device, dtype=dtype)
+    random_nk_dist_map = dist_map_helper(
+        rand_nk_ids, rand_nk_emb_train, ecs, model_lookup)
+    return random_nk_dist_map
