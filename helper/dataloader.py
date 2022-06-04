@@ -1,6 +1,6 @@
 import torch
 import random
-from helper.utils import format
+from helper.utils import format_esm
 
 def mine_negative(anchor, id_ec, ec_id, mine_neg):
     anchor_ec = id_ec[anchor]
@@ -44,4 +44,4 @@ class Dataset_with_mine_EC(torch.utils.data.Dataset):
         a = torch.load('./data/esm_data/' + anchor + '.pt')
         p = torch.load('./data/esm_data/' + pos + '.pt')
         n = torch.load('./data/esm_data/' + neg + '.pt')
-        return format(a), format(p), format(n) 
+        return format_esm(a), format_esm(p), format_esm(n) 

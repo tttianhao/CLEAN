@@ -14,7 +14,7 @@ def parse():
     parser.add_argument('-e', '--epoch', type=int, default=10000)
     parser.add_argument('-n', '--model_name', type=str,
                         default='default_model')
-    parser.add_argument('-t', '--training_data', type = str)
+    parser.add_argument('-t', '--training_data', type=str)
     parser.add_argument('-d', '--hidden_dim', type=int, default=512)
     parser.add_argument('-k', '--knn', type=int, default=10)
     parser.add_argument('-o', '--out_dim', type=int, default=128)
@@ -83,20 +83,38 @@ def mine_hard_negative(dist_map, knn=10):
     return negative
 
 
-def format(a):
+def format_esm(a):
     if type(a) == dict:
         a = a['mean_representations'][33]
     return a
 
 
-def esm_embedding(ec_id_dict, device, dtype):
-    def load_esm(lookup):
-        esm = format(torch.load('./data/esm_data/' + lookup + '.pt'))
-        return esm.unsqueeze(0)
+def load_esm(lookup):
+    esm = format_esm(torch.load('./data/esm_data/' + lookup + '.pt'))
+    return esm.unsqueeze(0)
 
+
+def esm_embedding(ec_id_dict, device, dtype):
+    '''
+    Loading esm embedding in the sequence of EC numbers
+    prepare for calculating cluster center by EC
+    '''
     esm_emb = []
     for ec in list(ec_id_dict.keys()):
         ids_for_query = list(ec_id_dict[ec])
         esm_to_cat = [load_esm(id) for id in ids_for_query]
         esm_emb = esm_emb + esm_to_cat
     return torch.cat(esm_emb).to(device=device, dtype=dtype)
+
+
+def model_embedding_test(id_ec_test, model, device, dtype):
+    '''
+    Instead of loading esm embedding in the sequence of EC numbers
+    the test embedding is loaded in the sequence of queries
+    then inferenced with model to get model embedding
+    '''
+    ids_for_query = list(id_ec_test.keys())
+    esm_to_cat = [load_esm(id) for id in ids_for_query]
+    esm_emb = torch.cat(esm_to_cat).to(device=device, dtype=dtype)
+    model_emb = model(esm_emb)
+    return model_emb

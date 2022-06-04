@@ -86,12 +86,12 @@ def main():
 
     #======================== training =======-=================#
     # loading ESM embedding for dist map
-    if os.path.exists('./data/distance_map/' + model_name + '_esm_dist.pkl'):
+    if os.path.exists('./data/distance_map/' + model_name + '_esm.pkl'):
         esm_emb = pickle.load(
-            open('./data/distance_map/' + model_name + '_esm_dist.pkl', 'rb')).to(device=device, dtype=dtype)
+            open('./data/distance_map/' + model_name + '_esm.pkl', 'rb')).to(device=device, dtype=dtype)
     else:
         esm_emb = esm_embedding(ec_id_dict, device, dtype)
-        pickle.dump(esm_emb, open('./data/distance_map/' + model_name + '_esm_dist.pkl', 'wb'))
+        pickle.dump(esm_emb, open('./data/distance_map/' + model_name + '_esm.pkl', 'wb'))
     # training
     for epoch in range(1, epochs + 1):
         if epoch % args.adaptive_rate == 0 and epoch != epochs + 1:
@@ -101,12 +101,9 @@ def main():
             dist_map = get_dist_map(
                 ec_id_dict, esm_emb, device, dtype, model=model)
             train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
-            pickle.dump(dist_map, open('./data/distance_map/' +
-                        model_name + '_' + str(epoch) + '.pkl', 'wb'))
         epoch_start_time = time.time()
         train_loss = train(model, args, epoch, train_loader,
                            optimizer, device, dtype, criterion)
-
         # only save the current best model near the end of training
         if (train_loss < best_loss and epoch > 0.8*epochs):
             torch.save(model.state_dict(), './model/' + model_name + '.pth')
