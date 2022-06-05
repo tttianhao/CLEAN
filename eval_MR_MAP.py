@@ -22,10 +22,8 @@ def eval_parse():
                         default='default_model')
     parser.add_argument('-d', '--hidden_dim', type=int, default=512)
     parser.add_argument('-o', '--out_dim', type=int, default=128)
-    parser.add_argument('-p', '--p_value', type=float, default=0.01)
-    parser.add_argument('-N', '--nk_random', type=float, default=10)
+    parser.add_argument('-p', '--penalty', type=int, default=11)
     parser.add_argument('--high_precision', type=bool, default=False)
-    parser.add_argument('--weighted_random', type=bool, default=True)
     args = parser.parse_args()
     return args
 
@@ -57,25 +55,14 @@ def main():
     eval_df = pd.DataFrame.from_dict(eval_dist)
     # write the top 10 closest EC to _top10.csv
     out_filename = './eval/' + args.test_data
-    # _ = write_top10_choices(eval_df, out_filename)
-    rand_nk_ids, rand_nk_emb_train = random_nk_model(
-        id_ec_train, ec_id_dict_train, emb_train,
-        n=args.nk_random, weighted=args.weighted_random)
-    random_nk_dist_map = get_random_nk_dist_map(
-        emb_train, rand_nk_emb_train, ec_id_dict_train, rand_nk_ids, device, dtype)
-    write_random_nk_choices(
-        eval_df, out_filename, random_nk_dist_map, p_value=args.p_value)
+    top10_dists = write_top10_choices(eval_df, out_filename)
+ 
     # get preds and true labels
-    pred_label = get_pred_labels(out_filename, pred_type='_randnk')
-    true_label, all_label = get_true_labels('./data/' + args.test_data)
-    pre, rec, f1, roc, acc = get_eval_metrics(
-        pred_label, true_label, all_label)
-    print(f'############ EC calling results using random '
-          f'chosen {args.nk_random}k samples ############')
+    pred_label = get_pred_labels(out_filename, pred_type='_top10')
+    true_label, all_label = get_true_labels('./data/'+args.test_data)
+    mean_rank, map = get_MR_MAP(pred_label, true_label, top10_dists, penalty=11)
     print('-' * 75)
-    print(f'>>> total samples: {len(true_label)} | total ec: {len(all_label)} |'
-          f'precision: {pre:.3} | recall: {rec:.3}\n'
-          f'>>> F1: {f1:.3} | AUC: {roc:.3} | accuracy: {acc:.3}')
+    print(f'>>> mean rank: {mean_rank:.5} | mean average precision:  {map:.5} |')
     print('-' * 75)
     return
 
