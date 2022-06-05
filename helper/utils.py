@@ -11,7 +11,7 @@ import numpy as np
 def parse():
     parser = argparse.ArgumentParser()
     parser.add_argument('-l', '--learning_rate', type=float, default=0.01)
-    parser.add_argument('-e', '--epoch', type=int, default=10000)
+    parser.add_argument('-e', '--epoch', type=int, default=3100)
     parser.add_argument('-n', '--model_name', type=str,
                         default='default_model')
     parser.add_argument('-t', '--training_data', type=str)
@@ -25,6 +25,7 @@ def parse():
     parser.add_argument('--log_interval', type=int, default=1)
     parser.add_argument('--high_precision', type=bool, default=False)
     parser.add_argument('--verbose', type=bool, default=False)
+    parser.add_argument('--beta2', type=float, default=0.999)
     args = parser.parse_args()
     return args
 

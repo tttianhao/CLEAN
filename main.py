@@ -53,6 +53,8 @@ def train(model, args, epoch, train_loader, optimizer, device, dtype, criterion)
 def main():
     seed_everything(1234)
     args = parse()
+    beta1 = 0.9
+    beta2 = args.beta2
     torch.backends.cudnn.benchmark = True
     # get train set, test set is only used during evaluation
     if args.training_data is None:
@@ -79,22 +81,23 @@ def main():
         else:
             dist_map = pickle.load(open('./data/distance_map/' + args.training_data + '.pkl', 'rb'))
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, betas=(beta1, beta2))
     criterion = nn.TripletMarginLoss(margin=args.margin, reduction='mean')
     best_loss = float('inf')
     train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
 
     #======================== training =======-=================#
     # loading ESM embedding for dist map
-    if os.path.exists('./data/distance_map/' + model_name + '_esm.pkl'):
+    if os.path.exists('./data/distance_map/' + args.training_data + '_esm.pkl'):
         esm_emb = pickle.load(
-            open('./data/distance_map/' + model_name + '_esm.pkl', 'rb')).to(device=device, dtype=dtype)
+            open('./data/distance_map/' + args.training_data + '_esm.pkl', 'rb')).to(device=device, dtype=dtype)
     else:
         esm_emb = esm_embedding(ec_id_dict, device, dtype)
-        pickle.dump(esm_emb, open('./data/distance_map/' + model_name + '_esm.pkl', 'wb'))
+        pickle.dump(esm_emb, open('./data/distance_map/' + args.training_data + '_esm.pkl', 'wb'))
     # training
     for epoch in range(1, epochs + 1):
         if epoch % args.adaptive_rate == 0 and epoch != epochs + 1:
+            optimizer = torch.optim.Adam(model.parameters(), lr=lr, betas=(beta1, beta2))
             torch.save(model.state_dict(), './model/' +
                        model_name + '_' + str(epoch) + '.pth')
             # sample new distance map
