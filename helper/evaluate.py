@@ -184,7 +184,7 @@ def get_MR_MAP_per_id(pred, true, dist, penalty=11):
     if len(ranks) == 0:
         ap_score = 0
     else:
-        ap_score = average_precision_score(labels, - np.array(dist))
+        ap_score =  len(ranks)*average_precision_score(labels, - np.array(dist))/len(true)
     # rank starts at 1
     ranks += 1
     nranks = len(true)
