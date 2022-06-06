@@ -22,8 +22,9 @@ def eval_parse():
                         default='default_model')
     parser.add_argument('-d', '--hidden_dim', type=int, default=512)
     parser.add_argument('-o', '--out_dim', type=int, default=128)
-    parser.add_argument('-p', '--p_value', type=float, default=0.001)
-    parser.add_argument('-N', '--nk_random', type=float, default=10)
+    parser.add_argument('-p', '--p_value', type=float, default=0.005)
+    parser.add_argument('-N', '--nk_random', type=float, default=20)
+    parser.add_argument('-EP', '--eval_pretrained', type=bool, default=False)
     parser.add_argument('--high_precision', type=bool, default=False)
     parser.add_argument('--weighted_random', type=bool, default=True)
     args = parser.parse_args()
@@ -46,9 +47,13 @@ def main():
     id_ec_test, _ = get_ec_id_dict(
         './data/' + args.test_data + '.csv')
     # load model
-    model = Net(args.hidden_dim, args.out_dim, device, dtype)
-    checkpoint = torch.load('./model/'+args.model_name+'.pth')
-    model.load_state_dict(checkpoint)
+    if args.eval_pretrained:
+        # no model used for pretrained embedding
+        model = lambda *args: args[0]
+    else:
+        model = Net(args.hidden_dim, args.out_dim, device, dtype)
+        checkpoint = torch.load('./model/'+args.model_name+'.pth')
+        model.load_state_dict(checkpoint)
     # compute distance map
     emb_train = model(esm_embedding(ec_id_dict_train, device, dtype))
     emb_test = model_embedding_test(id_ec_test, model, device, dtype)

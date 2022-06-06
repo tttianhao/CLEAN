@@ -23,7 +23,9 @@ def eval_parse():
     parser.add_argument('-d', '--hidden_dim', type=int, default=512)
     parser.add_argument('-o', '--out_dim', type=int, default=128)
     parser.add_argument('-p', '--penalty', type=int, default=11)
+    parser.add_argument('-t', '--top', type=int, default=10)
     parser.add_argument('--high_precision', type=bool, default=False)
+    parser.add_argument('-EP', '--eval_pretrained', type=bool, default=False)
     args = parser.parse_args()
     return args
 
@@ -44,9 +46,13 @@ def main():
     id_ec_test, _ = get_ec_id_dict(
         './data/' + args.test_data + '.csv')
     # load model
-    model = Net(args.hidden_dim, args.out_dim, device, dtype)
-    checkpoint = torch.load('./model/'+args.model_name+'.pth')
-    model.load_state_dict(checkpoint)
+    if args.eval_pretrained:
+        # no model used for pretrained embedding
+        model = lambda *args: args[0]
+    else:
+        model = Net(args.hidden_dim, args.out_dim, device, dtype)
+        checkpoint = torch.load('./model/'+args.model_name+'.pth')
+        model.load_state_dict(checkpoint)
     # compute distance map
     emb_train = model(esm_embedding(ec_id_dict_train, device, dtype))
     emb_test = model_embedding_test(id_ec_test, model, device, dtype)
@@ -55,14 +61,16 @@ def main():
     eval_df = pd.DataFrame.from_dict(eval_dist)
     # write the top 10 closest EC to _top10.csv
     out_filename = './eval/' + args.test_data
-    top10_dists = write_top10_choices(eval_df, out_filename)
- 
+    top_dists = write_top_choices(eval_df, out_filename, top=args.top)
+
     # get preds and true labels
-    pred_label = get_pred_labels(out_filename, pred_type='_top10')
+    pred_label = get_pred_labels(out_filename, pred_type='_top'+str(args.top))
     true_label, all_label = get_true_labels('./data/'+args.test_data)
-    mean_rank, map = get_MR_MAP(pred_label, true_label, top10_dists, penalty=11)
+    mean_rank, map = get_MR_MAP(
+        pred_label, true_label, top_dists, penalty=args.penalty)
     print('-' * 75)
-    print(f'>>> mean rank: {mean_rank:.5} | mean average precision:  {map:.5} |')
+    print(
+        f'>>> mean rank: {mean_rank:.5} | mean average precision:  {map:.5} |')
     print('-' * 75)
     return
 

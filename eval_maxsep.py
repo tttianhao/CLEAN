@@ -25,6 +25,7 @@ def eval_parse():
     parser.add_argument('--use_max_grad', type=bool, default=False)
     parser.add_argument('--first_grad', type=bool, default=True)
     parser.add_argument('--high_precision', type=bool, default=False)
+    parser.add_argument('-EP', '--eval_pretrained', type=bool, default=False)
     args = parser.parse_args()
     return args
 
@@ -45,9 +46,13 @@ def main():
     id_ec_test, _ = get_ec_id_dict(
         './data/' + args.test_data + '.csv')
     # load model
-    model = Net(args.hidden_dim, args.out_dim, device, dtype)
-    checkpoint = torch.load('./model/'+args.model_name+'.pth')
-    model.load_state_dict(checkpoint)
+    if args.eval_pretrained:
+        # no model used for pretrained embedding
+        model = lambda *args: args[0]
+    else:
+        model = Net(args.hidden_dim, args.out_dim, device, dtype)
+        checkpoint = torch.load('./model/'+args.model_name+'.pth')
+        model.load_state_dict(checkpoint)
     # compute distance map
     emb_train = model(esm_embedding(ec_id_dict_train, device, dtype))
     emb_test = model_embedding_test(id_ec_test, model, device, dtype)

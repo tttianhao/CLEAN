@@ -51,7 +51,7 @@ def convert_dict():
 
 def main():
     #convert_dict()
-    id_ec, ec_id = get_ec_id_dict('./data/train_ec5238_seq227358.csv')
+    id_ec, ec_id = get_ec_id_dict('./data/uniref10_train_split_4.csv')
     single_id = set()
     single_ec = set()
     for ec in ec_id.keys():
@@ -63,7 +63,7 @@ def main():
                 single_id.add(id)
                 break
     print(len(single_id), len(single_ec))
-    mask_sequences(single_id, 'train_ec5238_seq227358', 'full_data')
+    mask_sequences(single_id, 'uniref10_train_split_4', 'to_be_embed_esm_4')
 
 if __name__ == '__main__':
     main()

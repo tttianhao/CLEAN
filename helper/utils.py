@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 def parse():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-l', '--learning_rate', type=float, default=0.01)
+    parser.add_argument('-l', '--learning_rate', type=float, default=5e-4 )
     parser.add_argument('-e', '--epoch', type=int, default=3100)
     parser.add_argument('-n', '--model_name', type=str,
                         default='default_model')
@@ -17,7 +17,7 @@ def parse():
     parser.add_argument('-d', '--hidden_dim', type=int, default=512)
     parser.add_argument('-k', '--knn', type=int, default=10)
     parser.add_argument('-o', '--out_dim', type=int, default=128)
-    parser.add_argument('-b', '--batch_size', type=int, default=2720)
+    parser.add_argument('-b', '--batch_size', type=int, default=5000)
     parser.add_argument('-c', '--check_point', type=str, default='no')
     parser.add_argument('-m', '--margin', type=float, default=1)
     parser.add_argument('--adaptive_rate', type=int, default=100)

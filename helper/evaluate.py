@@ -76,15 +76,15 @@ def write_random_nk_choices(df, csv_name, random_nk_dist_map, p_value=0.05):
     return
 
 
-def write_top10_choices(df, csv_name):
-    out_file = open(csv_name + '_top10.csv', 'w', newline='')
+def write_top_choices(df, csv_name, top=30):
+    out_file = open(csv_name + '_top' + str(top)+'.csv', 'w', newline='')
     csvwriter = csv.writer(out_file, delimiter=',')
     dists = []
     for col in df.columns:
         ec = []
         dist_lst = []
-        smallest_10_dist_df = df[col].nsmallest(10)
-        for i in range(10):
+        smallest_10_dist_df = df[col].nsmallest(top)
+        for i in range(top):
             EC_i = smallest_10_dist_df.index[i]
             dist_i = smallest_10_dist_df[i]
             dist_str = "{:.4f}".format(dist_i)
@@ -184,12 +184,33 @@ def get_MR_MAP_per_id(pred, true, dist, penalty=11):
     if len(ranks) == 0:
         ap_score = 0
     else:
-        ap_score =  len(ranks)*average_precision_score(labels, - np.array(dist))/len(true)
+        ap_score = len(ranks)*average_precision_score(
+            labels, - np.array(dist))/len(true)
     # rank starts at 1
     ranks += 1
     nranks = len(true)
     ranksum = ranks.sum() + total_penalty
     return ranksum, nranks, ap_score
+
+# def get_MR_MAP_per_id(pred, true, dist, penalty=0):
+#     # get the rank of true labels in predicted labels
+#     ranks, = np.where(np.in1d(pred, true))
+#     # labels will have 1 only where a true label is present in pred labels
+#     labels = np.zeros(len(pred))
+#     labels[ranks] = 1
+#     # if a true label is not found in pred, add total rank with penalty
+    
+#     # set ap to 0 if true label not found in prediction
+#     if len(ranks) == 0:
+#         ap_score = 0
+#     else:
+#         ap_score = len(ranks)*average_precision_score(
+#             labels, - np.array(dist))/len(true)
+#     # rank starts at 1
+#     ranks += 1
+#     nranks = len(ranks)
+#     ranksum = ranks.sum() 
+#     return ranksum, nranks, ap_score
 
 
 def get_MR_MAP(pred_label, true_label, top_dists, penalty=11):
@@ -201,9 +222,10 @@ def get_MR_MAP(pred_label, true_label, top_dists, penalty=11):
         pred = pred_label[i]
         true = true_label[i]
         dist = top_dists[i]
-        ranksum_i, nranks_i, ap_score = get_MR_MAP_per_id(pred, true, dist, penalty=penalty)
+        ranksum_i, nranks_i, ap_score = get_MR_MAP_per_id(
+            pred, true, dist, penalty=penalty)
         ranksum += ranksum_i
         nranks += nranks_i
         map += ap_score
-    
+
     return ranksum/nranks, map/len(pred_label)

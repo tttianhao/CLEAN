@@ -3,13 +3,13 @@ import time
 import os
 import pickle
 from helper.dataloader import Dataset_with_mine_EC
-from helper.model import Net
+from helper.model import *
 from helper.utils import *
 import torch.nn as nn
 from helper.distance_map import get_dist_map
 
 
-def  get_dataloader(dist_map, id_ec, ec_id, args):
+def get_dataloader(dist_map, id_ec, ec_id, args):
     params = {
         'batch_size': args.batch_size,
         'shuffle': True,
@@ -20,7 +20,8 @@ def  get_dataloader(dist_map, id_ec, ec_id, args):
     return train_loader
 
 
-def train(model, args, epoch, train_loader, optimizer, device, dtype, criterion):
+def train_TripletMarginLoss(model, args, epoch, train_loader,
+                            optimizer, device, dtype, criterion):
     model.train()
     total_loss = 0.
     start_time = time.time()
@@ -58,30 +59,38 @@ def main():
     torch.backends.cudnn.benchmark = True
     # get train set, test set is only used during evaluation
     if args.training_data is None:
-        id_ec, ec_id_dict = get_ec_id_dict('./data/' + args.model_name + '.csv')
+        id_ec, ec_id_dict = get_ec_id_dict(
+            './data/' + args.model_name + '.csv')
     else:
-        id_ec, ec_id_dict = get_ec_id_dict('./data/' + args.training_data + '.csv')
+        id_ec, ec_id_dict = get_ec_id_dict(
+            './data/' + args.training_data + '.csv')
     ec_id = {key: list(ec_id_dict[key]) for key in ec_id_dict.keys()}
     #======================== override args ====================#
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda:0" if use_cuda else "cpu")
     dtype = torch.float64 if args.high_precision else torch.float32
-    lr, epochs, model_name = args.learning_rate, args.epoch, args.model_name
+    lr, epochs = args.learning_rate, args.epoch
+    model_name = '_'.join([args.model_name, 'lr',
+                          str(args.learning_rate), 'bs', str(args.batch_size)])
     print('==> device used:', device, '| dtype used: ',
           dtype, "\n==> args:", args)
     #======================== initialize model =================#
-    model = Net(args.hidden_dim, args.out_dim, device, dtype)
+    model = LayerNormNet(args.hidden_dim, args.out_dim, device, dtype)
     if args.check_point != 'no':
         checkpoint = torch.load('./model/' + args.check_point+'.pth')
         model.load_state_dict(checkpoint)
-        dist_map = pickle.load(open('./data/distance_map/uniref30_700.pkl', 'rb'))
+        dist_map = pickle.load(
+            open('./data/distance_map/uniref30_700.pkl', 'rb'))
     else:
         if args.training_data is None:
-            dist_map = pickle.load(open('./data/distance_map/' + args.model_name + '.pkl', 'rb'))
+            dist_map = pickle.load(
+                open('./data/distance_map/' + args.model_name + '.pkl', 'rb'))
         else:
-            dist_map = pickle.load(open('./data/distance_map/' + args.training_data + '.pkl', 'rb'))
+            dist_map = pickle.load(
+                open('./data/distance_map/' + args.training_data + '.pkl', 'rb'))
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr, betas=(beta1, beta2))
+    optimizer = torch.optim.Adam(
+        model.parameters(), lr=lr, betas=(beta1, beta2))
     criterion = nn.TripletMarginLoss(margin=args.margin, reduction='mean')
     best_loss = float('inf')
     train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
@@ -93,24 +102,27 @@ def main():
             open('./data/distance_map/' + args.training_data + '_esm.pkl', 'rb')).to(device=device, dtype=dtype)
     else:
         esm_emb = esm_embedding(ec_id_dict, device, dtype)
-        pickle.dump(esm_emb, open('./data/distance_map/' + args.training_data + '_esm.pkl', 'wb'))
+        pickle.dump(esm_emb, open('./data/distance_map/' +
+                    args.training_data + '_esm.pkl', 'wb'))
     # training
     for epoch in range(1, epochs + 1):
         if epoch % args.adaptive_rate == 0 and epoch != epochs + 1:
-            optimizer = torch.optim.Adam(model.parameters(), lr=lr, betas=(beta1, beta2))
-            # save updated model 
+            optimizer = torch.optim.Adam(
+                model.parameters(), lr=lr, betas=(beta1, beta2))
+            # save updated model
             torch.save(model.state_dict(), './model/' +
                        model_name + '_' + str(epoch) + '.pth')
             # delete last model checkpoint
             if epoch != args.adaptive_rate:
-                os.remove('./model/' + model_name + '_' + str(epoch-args.adaptive_rate) + '.pth')
+                os.remove('./model/' + model_name + '_' +
+                          str(epoch-args.adaptive_rate) + '.pth')
             # sample new distance map
             dist_map = get_dist_map(
                 ec_id_dict, esm_emb, device, dtype, model=model)
             train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
         epoch_start_time = time.time()
-        train_loss = train(model, args, epoch, train_loader,
-                           optimizer, device, dtype, criterion)
+        train_loss = train_TripletMarginLoss(model, args, epoch, train_loader,
+                                             optimizer, device, dtype, criterion)
         # only save the current best model near the end of training
         if (train_loss < best_loss and epoch > 0.8*epochs):
             torch.save(model.state_dict(), './model/' + model_name + '.pth')
