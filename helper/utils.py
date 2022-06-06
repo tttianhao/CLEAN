@@ -1,11 +1,10 @@
 import csv
 import random
 import argparse
-import math
-import pickle
 import os
 import torch
 import numpy as np
+from tqdm import tqdm
 
 
 def parse():
@@ -102,6 +101,7 @@ def esm_embedding(ec_id_dict, device, dtype):
     prepare for calculating cluster center by EC
     '''
     esm_emb = []
+    #for ec in tqdm(list(ec_id_dict.keys())):
     for ec in list(ec_id_dict.keys()):
         ids_for_query = list(ec_id_dict[ec])
         esm_to_cat = [load_esm(id) for id in ids_for_query]

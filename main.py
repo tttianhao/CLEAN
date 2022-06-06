@@ -9,7 +9,7 @@ import torch.nn as nn
 from helper.distance_map import get_dist_map
 
 
-def get_dataloader(dist_map, id_ec, ec_id, args):
+def  get_dataloader(dist_map, id_ec, ec_id, args):
     params = {
         'batch_size': args.batch_size,
         'shuffle': True,
@@ -98,8 +98,12 @@ def main():
     for epoch in range(1, epochs + 1):
         if epoch % args.adaptive_rate == 0 and epoch != epochs + 1:
             optimizer = torch.optim.Adam(model.parameters(), lr=lr, betas=(beta1, beta2))
+            # save updated model 
             torch.save(model.state_dict(), './model/' +
                        model_name + '_' + str(epoch) + '.pth')
+            # delete last model checkpoint
+            if epoch != args.adaptive_rate:
+                os.remove('./model/' + model_name + '_' + str(epoch-args.adaptive_rate) + '.pth')
             # sample new distance map
             dist_map = get_dist_map(
                 ec_id_dict, esm_emb, device, dtype, model=model)

@@ -22,7 +22,7 @@ def eval_parse():
                         default='default_model')
     parser.add_argument('-d', '--hidden_dim', type=int, default=512)
     parser.add_argument('-o', '--out_dim', type=int, default=128)
-    parser.add_argument('-p', '--p_value', type=float, default=0.01)
+    parser.add_argument('-p', '--p_value', type=float, default=0.001)
     parser.add_argument('-N', '--nk_random', type=float, default=10)
     parser.add_argument('--high_precision', type=bool, default=False)
     parser.add_argument('--weighted_random', type=bool, default=True)
