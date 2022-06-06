@@ -75,7 +75,7 @@ def main():
     print('==> device used:', device, '| dtype used: ',
           dtype, "\n==> args:", args)
     #======================== initialize model =================#
-    model = LayerNormNet(args.hidden_dim, args.out_dim, device, dtype)
+    model = InstanceNorm(args.hidden_dim, args.out_dim, device, dtype)
     if args.check_point != 'no':
         checkpoint = torch.load('./model/' + args.check_point+'.pth')
         model.load_state_dict(checkpoint)
