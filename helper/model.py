@@ -29,17 +29,17 @@ class LayerNormNet(nn.Module):
         self.dtype = dtype
 
         self.fc1 = nn.Linear(1280, hidden_dim, dtype=dtype, device=device)
-        self.ln1 = nn.LayerNorm(hidden_dim)
+        self.ln1 = nn.LayerNorm(hidden_dim, dtype=dtype, device=device)
         self.fc2 = nn.Linear(hidden_dim, hidden_dim,
                              dtype=dtype, device=device)
-        self.ln2 = nn.LayerNorm(hidden_dim)
+        self.ln2 = nn.LayerNorm(hidden_dim, dtype=dtype, device=device)
         self.fc3 = nn.Linear(hidden_dim, out_dim, dtype=dtype, device=device)
         self.dropout = nn.Dropout(p=drop_out)
 
     def forward(self, x):
-        x = self.drop_out(self.ln1(self.fc1(x)))
+        x = self.dropout(self.ln1(self.fc1(x)))
         x = torch.relu(x)
-        x = self.drop_out(self.ln2(self.fc2(x)))
+        x = self.dropout(self.ln2(self.fc2(x)))
         x = torch.relu(x)
         x = self.fc3(x)
         return x
@@ -55,17 +55,17 @@ class BatchNormNet(nn.Module):
         self.dtype = dtype
 
         self.fc1 = nn.Linear(1280, hidden_dim, dtype=dtype, device=device)
-        self.bn1 = nn.BatchNorm1d(hidden_dim)
+        self.bn1 = nn.BatchNorm1d(hidden_dim, dtype=dtype, device=device)
         self.fc2 = nn.Linear(hidden_dim, hidden_dim,
                              dtype=dtype, device=device)
-        self.bn2 = nn.BatchNorm1d(hidden_dim)
+        self.bn2 = nn.BatchNorm1d(hidden_dim, dtype=dtype, device=device)
         self.fc3 = nn.Linear(hidden_dim, out_dim, dtype=dtype, device=device)
         self.dropout = nn.Dropout(p=drop_out)
 
     def forward(self, x):
-        x = self.drop_out(self.bn1(self.fc1(x)))
+        x = self.dropout(self.bn1(self.fc1(x)))
         x = torch.relu(x)
-        x = self.drop_out(self.bn2(self.fc2(x)))
+        x = self.dropout(self.bn2(self.fc2(x)))
         x = torch.relu(x)
         x = self.fc3(x)
         return x
