@@ -70,12 +70,13 @@ def main():
     device = torch.device("cuda:0" if use_cuda else "cpu")
     dtype = torch.float64 if args.high_precision else torch.float32
     lr, epochs = args.learning_rate, args.epoch
-    model_name = '_'.join([args.model_name, 'lr',
-                          str(args.learning_rate), 'bs', str(args.batch_size)])
+    model_name = args.model_name
+    # model_name = '_'.join([args.model_name, 'lr',
+    #                       str(args.learning_rate), 'bs', str(args.batch_size)])
     print('==> device used:', device, '| dtype used: ',
           dtype, "\n==> args:", args)
     #======================== initialize model =================#
-    model = InstanceNorm(args.hidden_dim, args.out_dim, device, dtype)
+    model = LayerNormNet(args.hidden_dim, args.out_dim, device, dtype)
     if args.check_point != 'no':
         checkpoint = torch.load('./model/' + args.check_point+'.pth')
         model.load_state_dict(checkpoint)

@@ -1,5 +1,5 @@
 import torch
-from helper.model import Net
+from helper.model import *
 from helper.utils import *
 from helper.distance_map import *
 from helper.evaluate import *
@@ -50,7 +50,7 @@ def main():
         # no model used for pretrained embedding
         model = lambda *args: args[0]
     else:
-        model = Net(args.hidden_dim, args.out_dim, device, dtype)
+        model = LayerNormNet(args.hidden_dim, args.out_dim, device, dtype)
         checkpoint = torch.load('./model/'+args.model_name+'.pth')
         model.load_state_dict(checkpoint)
     # compute distance map
