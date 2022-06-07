@@ -17,7 +17,7 @@ def parse():
                         default='default_model')
     parser.add_argument('-t', '--training_data', type=str)
     parser.add_argument('-d', '--hidden_dim', type=int, default=512)
-    parser.add_argument('-k', '--knn', type=int, default=10)
+    parser.add_argument('-k', '--knn', type=int, default=30)
     parser.add_argument('-o', '--out_dim', type=int, default=128)
     parser.add_argument('-b', '--batch_size', type=int, default=5000)
     parser.add_argument('-c', '--check_point', type=str, default='no')
@@ -130,6 +130,22 @@ def main():
     # training
     for epoch in range(1, epochs + 1):
         if epoch % args.adaptive_rate == 0 and epoch != epochs + 1:
+            # adaptively decrease knn value
+            current_adaptive = epoch // args.adaptive_rate
+            if current_adaptive < 5:
+                args.knn = args.knn
+            elif current_adaptive >= 5 and current_adaptive < 10:
+                args.knn = 25
+            elif current_adaptive >= 10 and current_adaptive < 15:
+                args.knn = 20
+            elif current_adaptive >= 15 and current_adaptive < 20:
+                args.knn = 10
+            elif current_adaptive >= 20 and current_adaptive < 30:
+                args.knn = 8
+            else:
+                args.knn = 5
+            #----------------------------------------------------#
+            
             optimizer = torch.optim.Adam(
                 model.parameters(), lr=lr, betas=(beta1, beta2))
             # save updated model
@@ -143,6 +159,9 @@ def main():
             dist_map = get_dist_map(
                 ec_id_dict, esm_emb, device, dtype, model=model)
             train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
+            
+            
+            
         epoch_start_time = time.time()
         train_loss = train_TripletMarginLoss(model, args, epoch, train_loader,
                                              optimizer, device, dtype, criterion)
