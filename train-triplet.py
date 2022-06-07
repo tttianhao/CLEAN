@@ -9,6 +9,28 @@ import torch.nn as nn
 from helper.distance_map import get_dist_map
 
 
+def parse():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-l', '--learning_rate', type=float, default=5e-4)
+    parser.add_argument('-e', '--epoch', type=int, default=3100)
+    parser.add_argument('-n', '--model_name', type=str,
+                        default='default_model')
+    parser.add_argument('-t', '--training_data', type=str)
+    parser.add_argument('-d', '--hidden_dim', type=int, default=512)
+    parser.add_argument('-k', '--knn', type=int, default=10)
+    parser.add_argument('-o', '--out_dim', type=int, default=128)
+    parser.add_argument('-b', '--batch_size', type=int, default=5000)
+    parser.add_argument('-c', '--check_point', type=str, default='no')
+    parser.add_argument('-m', '--margin', type=float, default=0.1)
+    parser.add_argument('--adaptive_rate', type=int, default=100)
+    parser.add_argument('--log_interval', type=int, default=1)
+    parser.add_argument('--high_precision', type=bool, default=False)
+    parser.add_argument('--verbose', type=bool, default=False)
+    parser.add_argument('--beta2', type=float, default=0.999)
+    args = parser.parse_args()
+    return args
+
+
 def get_dataloader(dist_map, id_ec, ec_id, args):
     params = {
         'batch_size': args.batch_size,
