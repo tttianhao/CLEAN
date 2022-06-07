@@ -22,7 +22,7 @@ def eval_parse():
                         default='default_model')
     parser.add_argument('-d', '--hidden_dim', type=int, default=512)
     parser.add_argument('-o', '--out_dim', type=int, default=128)
-    parser.add_argument('-p', '--p_value', type=float, default=0.005)
+    parser.add_argument('-p', '--p_value', type=float, default=0.0001)
     parser.add_argument('-N', '--nk_random', type=float, default=20)
     parser.add_argument('-EP', '--eval_pretrained', type=bool, default=False)
     parser.add_argument('--high_precision', type=bool, default=False)
@@ -51,7 +51,7 @@ def main():
         # no model used for pretrained embedding
         model = lambda *args: args[0]
     else:
-        model = BatchNormNet(args.hidden_dim, args.out_dim, device, dtype)
+        model = LayerNormNet(args.hidden_dim, args.out_dim, device, dtype)
         checkpoint = torch.load('./model/'+args.model_name+'.pth')
         model.load_state_dict(checkpoint)
     # compute distance map

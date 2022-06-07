@@ -34,34 +34,6 @@ def get_ec_id_dict(csv_name: str) -> dict:
     return id_ec, ec_id
 
 
-def mine_hard_negative(dist_map, knn=10):
-    print("The number of unique EC numbers: ", len(dist_map.keys()))
-    ecs = list(dist_map.keys())
-    negative = {}
-    for i, target in enumerate(ecs):
-        sort_orders = sorted(
-            dist_map[target].items(), key=lambda x: x[1], reverse=False)
-        if sort_orders[1][1] != 0:
-            freq = [1/i[1] for i in sort_orders[1:1 + knn]]
-            neg_ecs = [i[0] for i in sort_orders[1:1 + knn]]
-        elif sort_orders[2][1] != 0:
-            freq = [1/i[1] for i in sort_orders[2:2+knn]]
-            neg_ecs = [i[0] for i in sort_orders[2:2+knn]]
-        elif sort_orders[3][1] != 0:
-            freq = [1/i[1] for i in sort_orders[3:3+knn]]
-            neg_ecs = [i[0] for i in sort_orders[3:3+knn]]
-        else:
-            freq = [1/i[1] for i in sort_orders[4:4+knn]]
-            neg_ecs = [i[0] for i in sort_orders[4:4+knn]]
-
-        normalized_freq = [i/sum(freq) for i in freq]
-        negative[target] = {
-            'weights': normalized_freq,
-            'negative': neg_ecs
-        }
-    return negative
-
-
 def format_esm(a):
     if type(a) == dict:
         a = a['mean_representations'][33]
