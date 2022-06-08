@@ -12,7 +12,7 @@ from helper.distance_map import get_dist_map
 def parse():
     parser = argparse.ArgumentParser()
     parser.add_argument('-l', '--learning_rate', type=float, default=5e-4)
-    parser.add_argument('-e', '--epoch', type=int, default=3000)
+    parser.add_argument('-e', '--epoch', type=int, default=3500)
     parser.add_argument('-n', '--model_name', type=str,
                         default='default_model')
     parser.add_argument('-t', '--training_data', type=str)
@@ -37,7 +37,7 @@ def get_dataloader(dist_map, id_ec, ec_id, args):
         'shuffle': True,
     }
     negative = mine_hard_negative(dist_map, args.knn)
-    train_data = Dataset_with_mine_EC(id_ec, ec_id, negative)
+    train_data = Triplet_dataset_with_mine_EC(id_ec, ec_id, negative)
     train_loader = torch.utils.data.DataLoader(train_data, **params)
     return train_loader
 
@@ -130,22 +130,6 @@ def main():
     # training
     for epoch in range(1, epochs + 1):
         if epoch % args.adaptive_rate == 0 and epoch != epochs + 1:
-            # adaptively decrease knn value
-            current_adaptive = epoch // args.adaptive_rate
-            if current_adaptive < 5:
-                args.knn = args.knn
-            elif current_adaptive >= 5 and current_adaptive < 10:
-                args.knn = 25
-            elif current_adaptive >= 10 and current_adaptive < 15:
-                args.knn = 20
-            elif current_adaptive >= 15 and current_adaptive < 20:
-                args.knn = 10
-            elif current_adaptive >= 20 and current_adaptive < 30:
-                args.knn = 8
-            else:
-                args.knn = 5
-            #----------------------------------------------------#
-            
             optimizer = torch.optim.Adam(
                 model.parameters(), lr=lr, betas=(beta1, beta2))
             # save updated model
@@ -159,9 +143,7 @@ def main():
             dist_map = get_dist_map(
                 ec_id_dict, esm_emb, device, dtype, model=model)
             train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
-            
-            
-            
+
         epoch_start_time = time.time()
         train_loss = train_TripletMarginLoss(model, args, epoch, train_loader,
                                              optimizer, device, dtype, criterion)

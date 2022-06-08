@@ -10,7 +10,7 @@ from helper.distance_map import *
 
 def get_esm_dist():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--train_file', type=str)
+    parser.add_argument('-t', '--train_file', type=str)
     args = parser.parse_args()
     _, ec_id_dict = get_ec_id_dict('./data/' + args.train_file + '.csv')
     # use cpu and high precision by default

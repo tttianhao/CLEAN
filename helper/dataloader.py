@@ -53,7 +53,7 @@ def random_positive(id, id_ec, ec_id):
     return pos
 
 
-class Dataset_with_mine_EC(torch.utils.data.Dataset):
+class Triplet_dataset_with_mine_EC(torch.utils.data.Dataset):
 
     def __init__(self, id_ec, ec_id, mine_neg):
         self.id_ec = id_ec
