@@ -5,23 +5,28 @@ import pickle
 from helper.dataloader import *
 from helper.model import *
 from helper.utils import *
+from helper.losses import *
 import torch.nn as nn
 from helper.distance_map import get_dist_map
 
 
 def parse():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-l', '--learning_rate', type=float, default=5e-4)
+    parser.add_argument('-l', '--learning_rate', type=float, default=5e-3)
     parser.add_argument('-e', '--epoch', type=int, default=3500)
     parser.add_argument('-n', '--model_name', type=str,
                         default='default_model')
     parser.add_argument('-t', '--training_data', type=str)
     parser.add_argument('-d', '--hidden_dim', type=int, default=512)
-    parser.add_argument('-k', '--knn', type=int, default=30)
     parser.add_argument('-o', '--out_dim', type=int, default=128)
-    parser.add_argument('-b', '--batch_size', type=int, default=5000)
     parser.add_argument('-c', '--check_point', type=str, default='no')
-    parser.add_argument('-m', '--margin', type=float, default=1)
+    parser.add_argument('-m', '--margin', type=float, default=0.1)
+    # ------------  n pair specific  ------------ #
+    parser.add_argument('-b', '--batch_size', type=int, default=512)
+    parser.add_argument('-k', '--knn', type=int, default=100)
+    parser.add_argument('-T', '--temp', type=float, default=0.5)
+    parser.add_argument('--n_neg', type=int, default=30)
+    # ------------------------------------------- #
     parser.add_argument('--adaptive_rate', type=int, default=100)
     parser.add_argument('--log_interval', type=int, default=1)
     parser.add_argument('--high_precision', type=bool, default=False)
@@ -37,7 +42,9 @@ def get_dataloader(dist_map, id_ec, ec_id, args):
         'shuffle': True,
     }
     negative = mine_hard_negative(dist_map, args.knn)
-    train_data = Triplet_dataset_with_mine_EC(id_ec, ec_id, negative)
+    # only one positive for N-pair loss
+    train_data = MultiPosNeg_dataset_with_mine_EC(
+        id_ec, ec_id, negative, 1, args.n_neg)
     train_loader = torch.utils.data.DataLoader(train_data, **params)
     return train_loader
 
@@ -50,12 +57,8 @@ def train(model, args, epoch, train_loader,
 
     for batch, data in enumerate(train_loader):
         optimizer.zero_grad()
-        anchor, positive, negative = data
-        anchor_out = model(anchor.to(device=device, dtype=dtype))
-        positive_out = model(positive.to(device=device, dtype=dtype))
-        negative_out = model(negative.to(device=device, dtype=dtype))
-
-        loss = criterion(anchor_out, positive_out, negative_out)
+        model_emb = model(data.to(device=device, dtype=dtype))
+        loss = criterion(model_emb, args.temp)
         loss.backward()
         optimizer.step()
 
@@ -114,7 +117,7 @@ def main():
 
     optimizer = torch.optim.Adam(
         model.parameters(), lr=lr, betas=(beta1, beta2))
-    criterion = nn.TripletMarginLoss(margin=args.margin, reduction='mean')
+    criterion = NPairLoss
     best_loss = float('inf')
     train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
     print("The number of unique EC numbers: ", len(dist_map.keys()))
