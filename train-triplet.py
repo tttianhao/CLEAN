@@ -117,7 +117,7 @@ def main():
     criterion = nn.TripletMarginLoss(margin=args.margin, reduction='mean')
     best_loss = float('inf')
     train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
-
+    print("The number of unique EC numbers: ", len(dist_map.keys()))
     #======================== training =======-=================#
     # loading ESM embedding for dist map
     if os.path.exists('./data/distance_map/' + args.training_data + '_esm.pkl'):
@@ -142,9 +142,11 @@ def main():
             # sample new distance map
             dist_map = get_dist_map(
                 ec_id_dict, esm_emb, device, dtype, model=model)
+        # create new dataset every 25 epochs
+        if epoch % 25 == 0 and epoch != epochs + 1:
             train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
-
         epoch_start_time = time.time()
+        train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
         train_loss = train_TripletMarginLoss(model, args, epoch, train_loader,
                                              optimizer, device, dtype, criterion)
         # only save the current best model near the end of training

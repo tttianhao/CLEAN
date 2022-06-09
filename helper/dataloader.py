@@ -4,7 +4,7 @@ from helper.utils import format_esm
 
 
 def mine_hard_negative(dist_map, knn=10):
-    print("The number of unique EC numbers: ", len(dist_map.keys()))
+    #print("The number of unique EC numbers: ", len(dist_map.keys()))
     ecs = list(dist_map.keys())
     negative = {}
     for i, target in enumerate(ecs):
