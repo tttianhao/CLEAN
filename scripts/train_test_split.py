@@ -8,7 +8,7 @@ from sklearn.model_selection import KFold
 
 
 def curate_testset():
-    uniref = [10,30,50]
+    uniref = [100]
     splits = [0,1,2,3,4]
 
     for u in uniref:
@@ -56,9 +56,10 @@ def cv5_split(s, test_index):
             trainwriter.writerow(rows)
 
 if __name__ == '__main__':
-    dummy = np.zeros(227362)
-    kf = KFold(n_splits=5, shuffle = True, random_state = 1234)
-    counter = 0
-    for train_index, test_index in kf.split(dummy):
-        cv5_split(counter, set(test_index))
-        counter += 1
+    curate_testset()
+    # dummy = np.zeros(227362)
+    # kf = KFold(n_splits=5, shuffle = True, random_state = 1234)
+    # counter = 0
+    # for train_index, test_index in kf.split(dummy):
+    #     cv5_split(counter, set(test_index))
+    #     counter += 1

@@ -1,9 +1,12 @@
 import torch
+import csv
 from helper.model import *
 from helper.utils import *
 from helper.distance_map import *
 from helper.evaluate import *
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 import warnings
 
 
@@ -24,6 +27,7 @@ def eval_parse():
     parser.add_argument('-o', '--out_dim', type=int, default=128)
     parser.add_argument('-p', '--p_value', type=float, default=0.0001)
     parser.add_argument('-N', '--nk_random', type=float, default=20)
+    parser.add_argument('-up', '--p_value_upper_bound', type = float, default = None)
     parser.add_argument('-EP', '--eval_pretrained', type=bool, default=False)
     parser.add_argument('--high_precision', type=bool, default=False)
     parser.add_argument('--weighted_random', type=bool, default=True)
@@ -68,20 +72,56 @@ def main():
         n=args.nk_random, weighted=args.weighted_random)
     random_nk_dist_map = get_random_nk_dist_map(
         emb_train, rand_nk_emb_train, ec_id_dict_train, rand_nk_ids, device, dtype)
-    write_random_nk_choices(
-        eval_df, out_filename, random_nk_dist_map, p_value=args.p_value)
-    # get preds and true labels
-    pred_label = get_pred_labels(out_filename, pred_type='_randnk')
-    true_label, all_label = get_true_labels('./data/' + args.test_data)
-    pre, rec, f1, roc, acc = get_eval_metrics(
-        pred_label, true_label, all_label)
-    print(f'############ EC calling results using random '
-          f'chosen {args.nk_random}k samples ############')
-    print('-' * 75)
-    print(f'>>> total samples: {len(true_label)} | total ec: {len(all_label)} |'
-          f'precision: {pre:.3} | recall: {rec:.3}\n'
-          f'>>> F1: {f1:.3} | AUC: {roc:.3} | accuracy: {acc:.3}')
-    print('-' * 75)
+    if args.p_value_upper_bound is None:
+        write_random_nk_choices(
+            eval_df, out_filename, random_nk_dist_map, p_value=args.p_value)
+        # get preds and true labels
+        pred_label = get_pred_labels(out_filename, pred_type='_randnk')
+        true_label, all_label = get_true_labels('./data/' + args.test_data)
+        pre, rec, f1, roc, acc = get_eval_metrics(
+            pred_label, true_label, all_label)
+        print(f'############ EC calling results using random '
+            f'chosen {args.nk_random}k samples ############')
+        print('-' * 75)
+        print(f'>>> total samples: {len(true_label)} | total ec: {len(all_label)} |'
+            f'precision: {pre:.3} | recall: {rec:.3}\n'
+            f'>>> F1: {f1:.3} | AUC: {roc:.3} | accuracy: {acc:.3}')
+        print('-' * 75)
+    else:
+        precisions = []
+        recalls = []
+        f1s = []
+        result_file = open('./eval/' + args.test_data + '_result.csv','w')
+        csvwriter = csv.writer(result_file, delimiter = ',')
+        csvwriter.writerow(['p-value','precision','recall','F1'])
+        for i in np.linspace(args.p_value, args.p_value_upper_bound, 12):
+            write_random_nk_choices(
+                eval_df, out_filename, random_nk_dist_map, p_value = i)
+            # get preds and true labels
+            pred_label = get_pred_labels(out_filename, pred_type='_randnk')
+            true_label, all_label = get_true_labels('./data/' + args.test_data)
+            pre, rec, f1, roc, acc = get_eval_metrics(
+                pred_label, true_label, all_label)
+            print(f'############ EC calling results using random '
+                f'chosen {args.nk_random}k samples ############')
+            print('-' * 75)
+            print(f'>>> p-value: {i:.3} |\n'
+                f'>>> total samples: {len(true_label)} | total ec: {len(all_label)} |'
+                f'precision: {pre:.3} | recall: {rec:.3}\n'
+                f'>>> F1: {f1:.3} | AUC: {roc:.3} | accuracy: {acc:.3}')
+            print('-' * 75)
+            precisions.append(pre)
+            recalls.append(rec)
+            f1s.append(f1)
+            csvwriter.writerow([i, pre, rec, f1])
+        fig, ax = plt.subplots()
+        ax.plot(recalls, precisions)
+
+        ax.set_title('Precision-Recall Curve')
+        ax.set_ylabel('Precision')
+        ax.set_xlabel('Recall')
+
+        plt.show()
     return
 
 

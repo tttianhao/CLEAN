@@ -19,7 +19,7 @@ def parse():
     parser.add_argument('-d', '--hidden_dim', type=int, default=512)
     parser.add_argument('-k', '--knn', type=int, default=30)
     parser.add_argument('-o', '--out_dim', type=int, default=128)
-    parser.add_argument('-b', '--batch_size', type=int, default=5000)
+    parser.add_argument('-b', '--batch_size', type=int, default=6000)
     parser.add_argument('-c', '--check_point', type=str, default='no')
     parser.add_argument('-m', '--margin', type=float, default=1)
     parser.add_argument('--adaptive_rate', type=int, default=100)
