@@ -107,7 +107,7 @@ def main():
             print(f'############ EC calling results using random '
                 f'chosen {args.nk_random}k samples ############')
             print('-' * 75)
-            print(f'>>> p-value: {i:.3} |\n'
+            print(f'>>> p-value: {p_values[i]:.3} |\n'
                 f'>>> total samples: {len(true_label)} | total ec: {len(all_label)} |'
                 f'precision: {pre:.3} | recall: {rec:.3}\n'
                 f'>>> F1: {f1:.3} | AUC: {roc:.3} | accuracy: {acc:.3}')
