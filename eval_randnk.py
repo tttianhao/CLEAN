@@ -28,6 +28,7 @@ def eval_parse():
     parser.add_argument('-p', '--p_value', type=float, default=0.0001)
     parser.add_argument('-N', '--nk_random', type=float, default=20)
     parser.add_argument('-up', '--p_value_upper_bound', type = float, default = None)
+    parser.add_argument('-s', '--step', type = int, default = 25)
     parser.add_argument('-EP', '--eval_pretrained', type=bool, default=False)
     parser.add_argument('--high_precision', type=bool, default=False)
     parser.add_argument('--weighted_random', type=bool, default=True)
@@ -94,7 +95,7 @@ def main():
         result_file = open('./eval/' + args.test_data + '_result.csv','w')
         csvwriter = csv.writer(result_file, delimiter = ',')
         csvwriter.writerow(['p-value','precision','recall','F1'])
-        for i in np.linspace(args.p_value, args.p_value_upper_bound, 12):
+        for i in np.linspace(args.p_value, args.p_value_upper_bound, args.step):
             write_random_nk_choices(
                 eval_df, out_filename, random_nk_dist_map, p_value = i)
             # get preds and true labels
