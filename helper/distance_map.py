@@ -21,7 +21,7 @@ def dist_map_helper(keys1, lookup1, keys2, lookup2):
     for i, key1 in tqdm(enumerate(keys1)):
         current = lookup1[i].unsqueeze(0)
         dist_norm = (current - lookup2).norm(dim=1, p=2)
-        dist_norm = (dist_norm**2).detach().cpu().numpy()
+        dist_norm = dist_norm.detach().cpu().numpy()
         dist[key1] = {}
         for j, key2 in enumerate(keys2):
             dist[key1][key2] = dist_norm[j]
