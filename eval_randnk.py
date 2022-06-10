@@ -66,7 +66,10 @@ def main():
         emb_train, emb_test, ec_id_dict_train, id_ec_test, device, dtype)
     eval_df = pd.DataFrame.from_dict(eval_dist)
     # write the top 10 closest EC to _top10.csv
-    out_filename = './eval/' + args.test_data
+    if not args.eval_pretrained:
+        out_filename = './eval/' + args.test_data
+    else:
+        out_filename = './eval/' + args.test_data + '_esm'
     # _ = write_top10_choices(eval_df, out_filename)
     rand_nk_ids, rand_nk_emb_train = random_nk_model(
         id_ec_train, ec_id_dict_train, emb_train,
@@ -92,7 +95,10 @@ def main():
         precisions = []
         recalls = []
         f1s = []
-        result_file = open('./eval/' + args.test_data + '_prc_result.csv','w')
+        if not args.eval_pretrained:
+            result_file = open('./eval/' + args.test_data + '_prc_result.csv','w')
+        else:
+            result_file = open('./eval/' + args.test_data + '_prc_esm_result.csv','w')
         csvwriter = csv.writer(result_file, delimiter = ',')
         csvwriter.writerow(['p-value','precision','recall','F1'])
         write_random_nk_choices_prc(
@@ -116,14 +122,14 @@ def main():
             recalls.append(rec)
             f1s.append(f1)
             csvwriter.writerow([p_values[i], pre, rec, f1])
-        fig, ax = plt.subplots()
-        ax.plot(recalls, precisions)
+        # fig, ax = plt.subplots()
+        # ax.plot(recalls, precisions)
 
-        ax.set_title('Precision-Recall Curve')
-        ax.set_ylabel('Precision')
-        ax.set_xlabel('Recall')
+        # ax.set_title('Precision-Recall Curve')
+        # ax.set_ylabel('Precision')
+        # ax.set_xlabel('Recall')
 
-        plt.show()
+        # plt.show()
     return
 
 
