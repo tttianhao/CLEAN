@@ -77,7 +77,7 @@ def write_random_nk_choices(df, csv_name, random_nk_dist_map, p_value=0.05):
     return
 
 def write_random_nk_choices_prc(df, csv_name, random_nk_dist_map, p_value = 0.0001, upper_bound=0.0025, steps = 24):
-    out_file = open(csv_name + '_randnk_prc.csv', 'w', newline='')
+    out_file = open(csv_name + '_randnk.csv', 'w', newline='')
     csvwriter = csv.writer(out_file, delimiter=',')
     all_test_EC = set()
     nk = len(random_nk_dist_map.keys())
