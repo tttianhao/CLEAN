@@ -197,7 +197,7 @@ def get_pred_labels_prc(out_filename, cutoff, pred_type="_maxsep"):
         for pred_ec_dist in preds_with_dist:
             # get EC number 3.5.2.6 from EC:3.5.2.6/10.8359
             ec_i = pred_ec_dist.split(":")[1].split("/")[0]
-            if ec_i == pred_ec_dist.split(":")[1].split("/")[1] <= cutoff:
+            if int(pred_ec_dist.split(":")[1].split("/")[1]) <= cutoff:
                 preds_ec_lst.append(ec_i)
         pred_label.append(preds_ec_lst)
     return pred_label
