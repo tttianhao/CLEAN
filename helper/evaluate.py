@@ -6,6 +6,7 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.metrics import precision_score, recall_score, \
     roc_auc_score, accuracy_score, f1_score, average_precision_score
+import numpy as np
 
 
 def maximum_separation(dist_lst, first_grad, use_max_grad):
@@ -75,6 +76,37 @@ def write_random_nk_choices(df, csv_name, random_nk_dist_map, p_value=0.05):
         csvwriter.writerow(ec)
     return
 
+def write_random_nk_choices_prc(df, csv_name, random_nk_dist_map, p_value = 0.0001, upper_bound=0.0025, steps = 24):
+    out_file = open(csv_name + '_randnk_prc.csv', 'w', newline='')
+    csvwriter = csv.writer(out_file, delimiter=',')
+    all_test_EC = set()
+    nk = len(random_nk_dist_map.keys())
+    threshold = np.linspace(p_value, upper_bound, steps)*nk
+    for col in tqdm(df.columns):
+        ec = []
+        smallest_10_dist_df = df[col].nsmallest(10)
+        for i in range(10):
+            EC_i = smallest_10_dist_df.index[i]
+            # find all the distances in the random nk w.r.t. EC_i
+            # then sorted the nk distances
+            rand_nk_dists = [random_nk_dist_map[rand_nk_id][EC_i]
+                             for rand_nk_id in random_nk_dist_map.keys()]
+            rand_nk_dists = np.sort(rand_nk_dists)
+            # rank dist_i among rand_nk_dists
+            dist_i = smallest_10_dist_df[i]
+            rank = np.searchsorted(rand_nk_dists, dist_i)
+            if (rank <= threshold[-1]) or (i == 0):
+                if i != 0:
+                    dist_str = str(np.searchsorted(threshold, rank))
+                else:
+                    dist_str = str(0)
+                all_test_EC.add(EC_i)
+                ec.append('EC:' + str(EC_i) + '/' + dist_str)
+            else:
+                break
+        ec.insert(0, col)
+        csvwriter.writerow(ec)
+    return
 
 def write_top_choices(df, csv_name, top=30):
     out_file = open(csv_name + '_top' + str(top)+'.csv', 'w', newline='')
@@ -154,6 +186,21 @@ def get_pred_labels(out_filename, pred_type="_maxsep"):
         pred_label.append(preds_ec_lst)
     return pred_label
 
+def get_pred_labels_prc(out_filename, cutoff, pred_type="_maxsep"):
+    file_name = out_filename+pred_type
+    result = open(file_name+'.csv', 'r')
+    csvreader = csv.reader(result, delimiter=',')
+    pred_label = []
+    for row in csvreader:
+        preds_ec_lst = []
+        preds_with_dist = row[1:]
+        for pred_ec_dist in preds_with_dist:
+            # get EC number 3.5.2.6 from EC:3.5.2.6/10.8359
+            ec_i = pred_ec_dist.split(":")[1].split("/")[0]
+            if ec_i == pred_ec_dist.split(":")[1].split("/")[1] <= cutoff:
+                preds_ec_lst.append(ec_i)
+        pred_label.append(preds_ec_lst)
+    return pred_label
 
 def get_eval_metrics(pred_label, true_label, all_label):
     mlb = MultiLabelBinarizer()

@@ -92,14 +92,15 @@ def main():
         precisions = []
         recalls = []
         f1s = []
-        result_file = open('./eval/' + args.test_data + '_result.csv','w')
+        result_file = open('./eval/' + args.test_data + '_prc_result.csv','w')
         csvwriter = csv.writer(result_file, delimiter = ',')
         csvwriter.writerow(['p-value','precision','recall','F1'])
-        for i in np.linspace(args.p_value, args.p_value_upper_bound, args.step):
-            write_random_nk_choices(
-                eval_df, out_filename, random_nk_dist_map, p_value = i)
+        write_random_nk_choices_prc(
+                eval_df, out_filename, random_nk_dist_map, args.p_value, args.p_value_upper_bound, args.step)
             # get preds and true labels
-            pred_label = get_pred_labels(out_filename, pred_type='_randnk')
+        p_values = np.linspace(args.p_value, args.p_value_upper_bound, args.step)
+        for i, p in enumerate(p_values):
+            pred_label = get_pred_labels_prc(out_filename, i, pred_type='_randnk')
             true_label, all_label = get_true_labels('./data/' + args.test_data)
             pre, rec, f1, roc, acc = get_eval_metrics(
                 pred_label, true_label, all_label)
@@ -114,7 +115,7 @@ def main():
             precisions.append(pre)
             recalls.append(rec)
             f1s.append(f1)
-            csvwriter.writerow([i, pre, rec, f1])
+            csvwriter.writerow([p_values[i], pre, rec, f1])
         fig, ax = plt.subplots()
         ax.plot(recalls, precisions)
 
