@@ -131,7 +131,7 @@ def main():
     print("The number of unique EC numbers: ", len(dist_map.keys()))
     #======================== training =======-=================#
     # training
-    for epoch in range(1, epochs + 1):
+    for epoch in range(args.check_point + 1, epochs + 1):
         if epoch % args.adaptive_rate == 0 and epoch != epochs + 1:
             optimizer = torch.optim.Adam(
                 model.parameters(), lr=lr, betas=(beta1, beta2))
