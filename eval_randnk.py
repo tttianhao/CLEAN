@@ -32,6 +32,7 @@ def eval_parse():
     parser.add_argument('-EP', '--eval_pretrained', type=bool, default=False)
     parser.add_argument('--high_precision', type=bool, default=False)
     parser.add_argument('--weighted_random', type=bool, default=True)
+    parser.add_argument('--dot', type=bool, default=False)
     args = parser.parse_args()
     return args
 
@@ -75,7 +76,8 @@ def main():
         id_ec_train, ec_id_dict_train, emb_train,
         n=args.nk_random, weighted=args.weighted_random)
     random_nk_dist_map = get_random_nk_dist_map(
-        emb_train, rand_nk_emb_train, ec_id_dict_train, rand_nk_ids, device, dtype)
+        emb_train, rand_nk_emb_train, ec_id_dict_train, rand_nk_ids, 
+        device, dtype, dot=args.dot)
     if args.p_value_upper_bound is None:
         write_random_nk_choices(
             eval_df, out_filename, random_nk_dist_map, p_value=args.p_value)

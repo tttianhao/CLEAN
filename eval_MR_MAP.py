@@ -25,6 +25,7 @@ def eval_parse():
     parser.add_argument('-p', '--penalty', type=int, default=11)
     parser.add_argument('-t', '--top', type=int, default=10)
     parser.add_argument('--high_precision', type=bool, default=False)
+    parser.add_argument('--dot', type=bool, default=False)
     parser.add_argument('-EP', '--eval_pretrained', type=bool, default=False)
     args = parser.parse_args()
     return args
@@ -57,7 +58,8 @@ def main():
     emb_train = model(esm_embedding(ec_id_dict_train, device, dtype))
     emb_test = model_embedding_test(id_ec_test, model, device, dtype)
     eval_dist = get_dist_map_test(
-        emb_train, emb_test, ec_id_dict_train, id_ec_test, device, dtype)
+        emb_train, emb_test, ec_id_dict_train, id_ec_test,
+        device, dtype, dot=args.dot)
     eval_df = pd.DataFrame.from_dict(eval_dist)
     # write the top 10 closest EC to _top10.csv
     out_filename = './eval/' + args.test_data
