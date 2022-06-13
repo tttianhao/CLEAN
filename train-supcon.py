@@ -19,16 +19,15 @@ def parse():
     parser.add_argument('-t', '--training_data', type=str)
     parser.add_argument('-d', '--hidden_dim', type=int, default=512)
     parser.add_argument('-o', '--out_dim', type=int, default=128)
-    parser.add_argument('-c', '--check_point', type=str, default='no')
-    parser.add_argument('-m', '--margin', type=float, default=1)
+    parser.add_argument('-c', '--check_point', type=int, default=0)
     # ------------  SupCon-Hard specific  ------------ #
-    parser.add_argument('-b', '--batch_size', type=int, default=512)
+    parser.add_argument('-b', '--batch_size', type=int, default=6000)
     parser.add_argument('-k', '--knn', type=int, default=100)
     parser.add_argument('-T', '--temp', type=float, default=0.1)
     parser.add_argument('--n_pos', type=int, default=9)
-    parser.add_argument('--n_neg', type=int, default=30)
+    parser.add_argument('--n_neg', type=int, default=40)
     # ------------------------------------------- #
-    parser.add_argument('--adaptive_rate', type=int, default=100)
+    parser.add_argument('--adaptive_rate', type=int, default=60)
     parser.add_argument('--log_interval', type=int, default=1)
     parser.add_argument('--high_precision', type=bool, default=False)
     parser.add_argument('--verbose', type=bool, default=False)
@@ -97,17 +96,26 @@ def main():
     dtype = torch.float64 if args.high_precision else torch.float32
     lr, epochs = args.learning_rate, args.epoch
     model_name = args.model_name
-    # model_name = '_'.join([args.model_name, 'lr',
-    #                       str(args.learning_rate), 'bs', str(args.batch_size)])
     print('==> device used:', device, '| dtype used: ',
           dtype, "\n==> args:", args)
+    #======================== ESM embedding ===================#
+    # loading ESM embedding for dist map
+    if os.path.exists('./data/distance_map/' + args.training_data + '_esm.pkl'):
+        esm_emb = pickle.load(
+            open('./data/distance_map/' + args.training_data + '_esm.pkl',
+                 'rb')).to(device=device, dtype=dtype)
+    else:
+        esm_emb = esm_embedding(ec_id_dict, device, dtype)
+        pickle.dump(esm_emb, open('./data/distance_map/' +
+                    args.training_data + '_esm.pkl', 'wb'))
     #======================== initialize model =================#
     model = LayerNormNet(args.hidden_dim, args.out_dim, device, dtype)
-    if args.check_point != 'no':
-        checkpoint = torch.load('./model/' + args.check_point+'.pth')
+    if args.check_point != 0:
+        checkpoint = torch.load(
+            './model/' + model_name + '_' + str(args.check_point) + '.pth')
         model.load_state_dict(checkpoint)
-        dist_map = pickle.load(
-            open('./data/distance_map/uniref30_700.pkl', 'rb'))
+        dist_map = get_dist_map(
+            ec_id_dict, esm_emb, device, dtype, model=model, dot=True)
     else:
         if args.training_data is None:
             dist_map = pickle.load(
@@ -123,16 +131,8 @@ def main():
     train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
     print("The number of unique EC numbers: ", len(dist_map.keys()))
     #======================== training =======-=================#
-    # loading ESM embedding for dist map
-    if os.path.exists('./data/distance_map/' + args.training_data + '_esm.pkl'):
-        esm_emb = pickle.load(
-            open('./data/distance_map/' + args.training_data + '_esm.pkl', 'rb')).to(device=device, dtype=dtype)
-    else:
-        esm_emb = esm_embedding(ec_id_dict, device, dtype)
-        pickle.dump(esm_emb, open('./data/distance_map/' +
-                    args.training_data + '_esm.pkl', 'wb'))
     # training
-    for epoch in range(1, epochs + 1):
+    for epoch in range(args.check_point + 1, epochs + 1):
         if epoch % args.adaptive_rate == 0 and epoch != epochs + 1:
             optimizer = torch.optim.Adam(
                 model.parameters(), lr=lr, betas=(beta1, beta2))
@@ -145,7 +145,7 @@ def main():
                           str(epoch-args.adaptive_rate) + '.pth')
             # sample new distance map
             dist_map = get_dist_map(
-                ec_id_dict, esm_emb, device, dtype, model=model)
+                ec_id_dict, esm_emb, device, dtype, model=model, dot=True)
             train_loader = get_dataloader(dist_map, id_ec, ec_id, args)
         # -------------------------------------------------------------------- #
         epoch_start_time = time.time()
