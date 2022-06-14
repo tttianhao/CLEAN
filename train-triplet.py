@@ -109,7 +109,7 @@ def main():
                     args.training_data + '_esm.pkl', 'wb'))
     #======================== initialize model =================#
     model = LayerNormNet(args.hidden_dim, args.out_dim, device, dtype)
-    if args.check_point != 'no':
+    if args.check_point != 0:
         checkpoint = torch.load(
             './model/' + model_name + '_' + str(args.check_point) + '.pth')
         model.load_state_dict(checkpoint)

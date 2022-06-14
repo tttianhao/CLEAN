@@ -36,3 +36,4 @@ done
 
 
  
+# python -u ./train-supcon.py -t uniref10/uniref10_train_split_3 -n uniref10_split3_supcon > out/uniref10_split3_supcon.out
