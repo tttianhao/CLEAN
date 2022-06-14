@@ -20,3 +20,4 @@ out/
 *.pyc
 !eval
 !prc.sh
+*.zip
