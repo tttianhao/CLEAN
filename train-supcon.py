@@ -13,16 +13,16 @@ from helper.distance_map import get_dist_map
 def parse():
     parser = argparse.ArgumentParser()
     parser.add_argument('-l', '--learning_rate', type=float, default=5e-4)
-    parser.add_argument('-e', '--epoch', type=int, default=3500)
+    parser.add_argument('-e', '--epoch', type=int, default=2500)
     parser.add_argument('-n', '--model_name', type=str,
                         default='default_model')
     parser.add_argument('-t', '--training_data', type=str)
     parser.add_argument('-d', '--hidden_dim', type=int, default=512)
-    parser.add_argument('-o', '--out_dim', type=int, default=128)
+    parser.add_argument('-o', '--out_dim', type=int, default=256)
     parser.add_argument('-c', '--check_point', type=int, default=0)
     # ------------  SupCon-Hard specific  ------------ #
     parser.add_argument('-b', '--batch_size', type=int, default=6000)
-    parser.add_argument('-k', '--knn', type=int, default=100)
+    parser.add_argument('-k', '--knn', type=int, default=300)
     parser.add_argument('-T', '--temp', type=float, default=0.1)
     parser.add_argument('--n_pos', type=int, default=9)
     parser.add_argument('--n_neg', type=int, default=40)
