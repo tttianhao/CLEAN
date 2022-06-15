@@ -98,9 +98,9 @@ def main():
         recalls = []
         f1s = []
         if not args.eval_pretrained:
-            result_file = open('./eval/' + args.test_data + '_prc_result.csv','w')
+            result_file = open('./eval/' + args.test_data + '_prc_result.csv','w', newline='')
         else:
-            result_file = open('./eval/' + args.test_data + '_prc_esm_result.csv','w')
+            result_file = open('./eval/' + args.test_data + '_prc_esm_result.csv','w', newline='')
         csvwriter = csv.writer(result_file, delimiter = ',')
         csvwriter.writerow(['p-value','precision','recall','F1'])
         write_random_nk_choices_prc(

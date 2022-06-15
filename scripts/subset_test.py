@@ -40,13 +40,14 @@ def main():
 
             if id_count_ec >= 2 and id_count_ec < 5:
                 out_writer_lst[0].writerow(row)
-            elif id_count_ec >= 5 and id_count_ec < 20:
+            elif id_count_ec >= 5 and id_count_ec < 10:
                 out_writer_lst[1].writerow(row)
-            elif id_count_ec >= 20 and id_count_ec < 50:
+            elif id_count_ec >= 10 and id_count_ec < 25:
                 out_writer_lst[2].writerow(row)
-            elif id_count_ec >= 50 and id_count_ec < 100:
+            elif id_count_ec >= 25 and id_count_ec < 50:
                 out_writer_lst[3].writerow(row)
-            else:
+            # for cases >= 50
+            elif id_count_ec >= 2:
                 out_writer_lst[4].writerow(row)
 
 
