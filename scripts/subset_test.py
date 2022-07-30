@@ -38,18 +38,17 @@ def main():
             id_count_lst = [len(ec_id_dict_tr[ec]) for ec in true_ec_lst]
             id_count_ec = np.max(id_count_lst)
 
-            if id_count_ec >= 1 and id_count_ec < 5:
+            if id_count_ec > 0 and id_count_ec <= 5:
                 out_writer_lst[0].writerow(row)
-            elif id_count_ec >= 5 and id_count_ec < 10:
+            elif id_count_ec > 5 and id_count_ec <= 10:
                 out_writer_lst[1].writerow(row)
-            elif id_count_ec >= 10 and id_count_ec < 25:
+            elif id_count_ec > 10 and id_count_ec <= 25:
                 out_writer_lst[2].writerow(row)
-            elif id_count_ec >= 25 and id_count_ec < 50:
+            elif id_count_ec > 25 and id_count_ec <= 50:
                 out_writer_lst[3].writerow(row)
             # for cases >= 50
-            elif id_count_ec >= 2:
+            elif id_count_ec > 50:
                 out_writer_lst[4].writerow(row)
-
 
 if __name__ == '__main__':
     main()

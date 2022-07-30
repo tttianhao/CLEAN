@@ -6,6 +6,7 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.metrics import precision_score, recall_score, \
     roc_auc_score, accuracy_score, f1_score, average_precision_score
+from tqdm import tqdm
 import numpy as np
 
 
@@ -76,7 +77,8 @@ def write_random_nk_choices(df, csv_name, random_nk_dist_map, p_value=0.05):
         csvwriter.writerow(ec)
     return
 
-def write_random_nk_choices_prc(df, csv_name, random_nk_dist_map, p_value = 0.0001, upper_bound=0.0025, steps = 24):
+
+def write_random_nk_choices_prc(df, csv_name, random_nk_dist_map, p_value=0.0001, upper_bound=0.0025, steps=24):
     out_file = open(csv_name + '_randnk.csv', 'w', newline='')
     csvwriter = csv.writer(out_file, delimiter=',')
     all_test_EC = set()
@@ -107,6 +109,7 @@ def write_random_nk_choices_prc(df, csv_name, random_nk_dist_map, p_value = 0.00
         ec.insert(0, col)
         csvwriter.writerow(ec)
     return
+
 
 def write_top_choices(df, csv_name, top=30):
     out_file = open(csv_name + '_top' + str(top)+'.csv', 'w', newline='')
@@ -140,7 +143,7 @@ def random_nk_model(id_ec_train, ec_id_dict_train, emb_train, n=10, weighted=Fal
             P.append(1/np.max(ec_densities))
         P = P/np.sum(P)
         random_nk_id = np.random.choice(
-            range(len(ids)), nk, replace=False, p=P)
+            range(len(ids)), nk, replace=True, p=P)
     else:
         random_nk_id = np.random.choice(range(len(ids)), nk, replace=False)
 
@@ -148,6 +151,31 @@ def random_nk_model(id_ec_train, ec_id_dict_train, emb_train, n=10, weighted=Fal
     chosen_ids = [ids[i] for i in random_nk_id]
     chosen_emb_train = emb_train[random_nk_id]
     return chosen_ids, chosen_emb_train
+
+
+def update_dist_dict_blast(emb_test, emb_train, dist, start, end,
+                           id_ec_test, id_ec_train):
+
+    id_tests = list(id_ec_test.keys())
+    id_trains = list(id_ec_train.keys())
+    dist_matrix = torch.cdist(emb_test[start:end], emb_train)
+    for i, id_test in tqdm(enumerate(id_tests[start:end])):
+        dist[id_test] = {}
+        # continue adding EC/dist pairs until have 20 EC
+        idx_train_closest_sorted = torch.argsort(dist_matrix[i], dim=-1)
+        count = 0
+        while len(dist[id_test]) <= 10:
+            idx_train_closest = idx_train_closest_sorted[count]
+            dist_train_closest = dist_matrix[i][idx_train_closest].cpu().item()
+            count += 1
+            id_train_closest = id_trains[idx_train_closest]
+            ECs_train_closest = id_ec_train[id_train_closest]
+            for EC in ECs_train_closest:
+                # if EC is not added to the dict
+                if EC not in dist[id_test]:
+                    # add EC/dist pair
+                    dist[id_test][EC] = dist_train_closest
+    return dist
 
 
 def get_true_labels(file_name):
@@ -186,6 +214,7 @@ def get_pred_labels(out_filename, pred_type="_maxsep"):
         pred_label.append(preds_ec_lst)
     return pred_label
 
+
 def get_pred_labels_prc(out_filename, cutoff, pred_type="_maxsep"):
     file_name = out_filename+pred_type
     result = open(file_name+'.csv', 'r')
@@ -201,6 +230,7 @@ def get_pred_labels_prc(out_filename, cutoff, pred_type="_maxsep"):
                 preds_ec_lst.append(ec_i)
         pred_label.append(preds_ec_lst)
     return pred_label
+
 
 def get_eval_metrics(pred_label, true_label, all_label):
     mlb = MultiLabelBinarizer()
@@ -239,6 +269,7 @@ def get_MR_MAP_per_id(pred, true, dist, penalty=11):
     ranksum = ranks.sum() + total_penalty
     return ranksum, nranks, ap_score
 
+
 # def get_MR_MAP_per_id(pred, true, dist, penalty=0):
 #     # get the rank of true labels in predicted labels
 #     ranks, = np.where(np.in1d(pred, true))
@@ -246,7 +277,7 @@ def get_MR_MAP_per_id(pred, true, dist, penalty=11):
 #     labels = np.zeros(len(pred))
 #     labels[ranks] = 1
 #     # if a true label is not found in pred, add total rank with penalty
-    
+
 #     # set ap to 0 if true label not found in prediction
 #     if len(ranks) == 0:
 #         ap_score = 0
@@ -256,7 +287,7 @@ def get_MR_MAP_per_id(pred, true, dist, penalty=11):
 #     # rank starts at 1
 #     ranks += 1
 #     nranks = len(ranks)
-#     ranksum = ranks.sum() 
+#     ranksum = ranks.sum()
 #     return ranksum, nranks, ap_score
 
 

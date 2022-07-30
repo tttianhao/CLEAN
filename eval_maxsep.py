@@ -54,6 +54,7 @@ def main():
         model = LayerNormNet(args.hidden_dim, args.out_dim, device, dtype)
         checkpoint = torch.load('./model/'+args.model_name+'.pth')
         model.load_state_dict(checkpoint)
+        model.eval()
     # compute distance map
     emb_train = model(esm_embedding(ec_id_dict_train, device, dtype))
     emb_test = model_embedding_test(id_ec_test, model, device, dtype)
@@ -75,9 +76,9 @@ def main():
         pred_label, true_label, all_label)
     print("############ EC calling results using maximum separation ############")
     print('-' * 75)
-    print(f'>>> total samples: {len(true_label)} | total ec: {len(all_label)} |'
-          f'precision: {pre:.3} | recall: {rec:.3}\n'
-          f'>>> F1: {f1:.3} | AUC: {roc:.3} | accuracy: {acc:.3}')
+    print(f'>>> total samples: {len(true_label)} | total ec {len(all_label)} |\n'
+          f'precision | recall | F1 | AUC | accuracy' )
+    print( f'{pre:.5} , {rec:.5} , {f1:.5} , {roc:.5} , {acc:.5}')
     print('-' * 75)
     return
 

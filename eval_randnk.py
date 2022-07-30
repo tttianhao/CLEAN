@@ -60,6 +60,7 @@ def main():
         model = LayerNormNet(args.hidden_dim, args.out_dim, device, dtype)
         checkpoint = torch.load('./model/'+args.model_name+'.pth')
         model.load_state_dict(checkpoint)
+        model.eval()
     # compute distance map
     emb_train = model(esm_embedding(ec_id_dict_train, device, dtype))
     emb_test = model_embedding_test(id_ec_test, model, device, dtype)

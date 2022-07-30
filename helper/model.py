@@ -43,6 +43,7 @@ class LayerNormNet(nn.Module):
         x = torch.relu(x)
         x = self.fc3(x)
         return x
+ 
 
 
 class BatchNormNet(nn.Module):

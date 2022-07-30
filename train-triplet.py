@@ -74,7 +74,7 @@ def train(model, args, epoch, train_loader,
 
 
 def main():
-    seed_everything(1234)
+    #seed_everything(1234)
     args = parse()
     beta1 = 0.9
     beta2 = args.beta2

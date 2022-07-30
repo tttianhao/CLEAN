@@ -51,6 +51,37 @@ def get_ec_id_dict_non_prom(csv_name: str) -> dict:
                         ec_id[ec].add(rows[0])
     return id_ec, ec_id
 
+# def get_ec_id_dict_single_ec(csv_name: str) -> dict:
+#     csv_file = open(csv_name)
+#     csvreader = csv.reader(csv_file, delimiter='\t')
+#     id_ec = {}
+#     ec_id = {}
+
+#     for i, rows in enumerate(csvreader):
+#         if i > 0:
+#             if len(rows[1].split(';')) == 1:
+#                 id_ec[rows[0]] = rows[1].split(';')
+#                 for ec in rows[1].split(';'):
+#                     if ec not in ec_id.keys():
+#                         ec_id[ec] = set()
+#                         ec_id[ec].add(rows[0])
+#                     else:
+#                         ec_id[ec].add(rows[0])
+
+#     csv_file = open(csv_name)
+#     csvreader = csv.reader(csv_file, delimiter='\t')
+    
+#     for i, rows in enumerate(csvreader):
+#         if i > 0:
+#             if len(rows[1].split(';')) > 1:
+#                 id_ec[rows[0]] = rows[1].split(';')
+#                 for ec in rows[1].split(';'):
+#                     if ec not in ec_id.keys():
+#                         ec_id[ec] = set()
+#                         ec_id[ec].add(rows[0])
+                     
+#     return id_ec, ec_id
+
 def format_esm(a):
     if type(a) == dict:
         a = a['mean_representations'][33]
@@ -87,3 +118,13 @@ def model_embedding_test(id_ec_test, model, device, dtype):
     esm_emb = torch.cat(esm_to_cat).to(device=device, dtype=dtype)
     model_emb = model(esm_emb)
     return model_emb
+
+def model_embedding_test_ensemble(id_ec_test, device, dtype):
+    '''
+    Instead of loading esm embedding in the sequence of EC numbers
+    the test embedding is loaded in the sequence of queries
+    '''
+    ids_for_query = list(id_ec_test.keys())
+    esm_to_cat = [load_esm(id) for id in ids_for_query]
+    esm_emb = torch.cat(esm_to_cat).to(device=device, dtype=dtype)
+    return esm_emb
