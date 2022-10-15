@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: CLEAN
+Version: 0.1
+Summary: CLEAN: Enzyme Function Prediction using Contrastive Learning
+Home-page: https://github.com/tttianhao/CLEAN
+Author: Tianhao Yu, Haiyang Cui, Jianan Canal Li, Yunan Luo, Huimin Zhao
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/tttianhao/CLEAN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: Apache-2.0 License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+
+UNKNOWN
+
