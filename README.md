@@ -146,7 +146,9 @@ infer_maxsep(train_data, fasta_name, report_metrics=False, pretrained=True)
 ## 3. Training
 We provide the scripts for CLEAN models with both `triplet margin` and `Supcon-Hard` losses. Supcon-Hard Loss samples multiple positives and negatives and performs better than Triplet Margin Loss small training datasets, however it takes longer time to train. 
 `triplet margin` loss is given as:
+
 $$ \mathcal{L}^{TM} = ||z_a - z_p||_2  - ||z_a - z_n||_2 + \alpha ,$$
+
 where $z_a$ is the anchor, $z_p$ is the positive, $z_n$ is the hard-mined negative. `SupCon-Hard` loss is given as:
 
 $$\mathcal{L}^{sup} = \sum_{e\in E} \frac{-1}{|P(e)|}\sum_{z_p \in P(e)}\log    \frac{\exp (z_e \cdot z_p / \tau)}{\sum_{z_a \in A(e)} \exp (z_i \cdot z_a / \tau) } $$
