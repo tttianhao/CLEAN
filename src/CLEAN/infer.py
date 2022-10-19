@@ -10,16 +10,30 @@ def warn(*args, **kwargs):
     pass
 warnings.warn = warn
 
-def infer_pvalue(train_data, test_data, p_value = 1e-5, 
-                 nk_random = 20, report_metrics = False):
+def infer_pvalue(train_data, test_data, p_value = 1e-5, nk_random = 20, 
+                 report_metrics = False, pretrained=True, model_name=None):
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda:0" if use_cuda else "cpu")
     dtype = torch.float32
     id_ec_train, ec_id_dict_train = get_ec_id_dict('./data/' + train_data + '.csv')
     id_ec_test, _ = get_ec_id_dict('./data/' + test_data + '.csv')
     # load checkpoints
+    # NOTE: change this to LayerNormNet(512, 256, device, dtype) 
+    # and rebuild with [python build.py install]
+    # if inferencing on model trained with supconH loss
     model = LayerNormNet(512, 128, device, dtype)
-    checkpoint = torch.load('./data/pretrained/'+ train_data +'.pth')
+    
+    if pretrained:
+        try:
+            checkpoint = torch.load('./data/pretrained/'+ train_data +'.pth')
+        except FileNotFoundError as error:
+            raise Exception('No pretrained weights for this training data')
+    else:
+        try:
+            checkpoint = torch.load('./data/model/'+ model_name +'.pth')
+        except FileNotFoundError as error:
+            raise Exception('No model found!')
+        
     model.load_state_dict(checkpoint)
     model.eval()
     # load precomputed EC cluster center embeddings if possible
@@ -53,18 +67,33 @@ def infer_pvalue(train_data, test_data, p_value = 1e-5,
             f'>>> precision: {pre:.3} | recall: {rec:.3}'
             f'| F1: {f1:.3} | AUC: {roc:.3} ')
         print('-' * 75)  
-    return
+    
 
 
-def infer_maxsep(train_data, test_data, report_metrics = False):
+def infer_maxsep(train_data, test_data, report_metrics = False, 
+                 pretrained=True, model_name=None):
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda:0" if use_cuda else "cpu")
     dtype = torch.float32
     id_ec_train, ec_id_dict_train = get_ec_id_dict('./data/' + train_data + '.csv')
     id_ec_test, _ = get_ec_id_dict('./data/' + test_data + '.csv')
     # load checkpoints
+    # NOTE: change this to LayerNormNet(512, 256, device, dtype) 
+    # and rebuild with [python build.py install]
+    # if inferencing on model trained with supconH loss
     model = LayerNormNet(512, 128, device, dtype)
-    checkpoint = torch.load('./data/pretrained/'+ train_data +'.pth')
+    
+    if pretrained:
+        try:
+            checkpoint = torch.load('./data/pretrained/'+ train_data +'.pth')
+        except FileNotFoundError as error:
+            raise Exception('No pretrained weights for this training data')
+    else:
+        try:
+            checkpoint = torch.load('./data/model/'+ model_name +'.pth')
+        except FileNotFoundError as error:
+            raise Exception('No model found!')
+            
     model.load_state_dict(checkpoint)
     model.eval()
     # load precomputed EC cluster center embeddings if possible
@@ -82,7 +111,6 @@ def infer_maxsep(train_data, test_data, report_metrics = False):
     ensure_dirs("./results")
     out_filename = "results/" +  test_data
     write_max_sep_choices(eval_df, out_filename)
-    report_metrics = True
     if report_metrics:
         pred_label = get_pred_labels(out_filename, pred_type='_maxsep')
         true_label, all_label = get_true_labels('./data/' + test_data)
@@ -93,4 +121,3 @@ def infer_maxsep(train_data, test_data, report_metrics = False):
             f'>>> precision: {pre:.3} | recall: {rec:.3}'
             f'| F1: {f1:.3} | AUC: {roc:.3} ')
         print('-' * 75)
-    return

@@ -5,7 +5,8 @@ from re import L
 import torch
 import numpy as np
 import subprocess
-
+import pickle
+from .distance_map import get_dist_map
 
 def seed_everything(seed=1234):
     random.seed(seed)
@@ -121,3 +122,26 @@ def retrive_esm1b_embedding(fasta_name):
               fasta_name, esm_out, "--include mean"])
     subprocess.call(command)
  
+def compute_esm_distance(train_file):
+    ensure_dirs('./data/distance_map/')
+    _, ec_id_dict = get_ec_id_dict('./data/' + train_file + '.csv')
+    use_cuda = torch.cuda.is_available()
+    device = torch.device("cuda:0" if use_cuda else "cpu")
+    dtype = torch.float32
+    esm_emb = esm_embedding(ec_id_dict, device, dtype)
+    esm_dist = get_dist_map(ec_id_dict, esm_emb, device, dtype)
+    pickle.dump(esm_dist, open('./data/distance_map/' + train_file + '.pkl', 'wb'))
+    pickle.dump(esm_emb, open('./data/distance_map/' + train_file + '_esm.pkl', 'wb'))
+    
+def prepare_infer_fasta(fasta_name):
+    retrive_esm1b_embedding(fasta_name)
+    csvfile = open('./data/' + fasta_name +'.csv', 'w', newline='')
+    csvwriter = csv.writer(csvfile, delimiter = '\t')
+    csvwriter.writerow(['Entry', 'EC number', 'Sequence'])
+    fastafile = open('./data/' + fasta_name +'.fasta', 'r')
+    for i in fastafile.readlines():
+        if i[0] == '>':
+            csvwriter.writerow([i.strip()[1:], ' ', ' '])
+    
+
+
