@@ -1,0 +1,27 @@
+        ____                 _____
+       / __ \___  ___  ____ / ___/___  ____ ___  _____  ____  ________
+      / / / / _ \/ _ \/ __ \\__ \/ _ \/ __ `/ / / / _ \/ __ \/ ___/ _ \
+     / /_/ /  __/  __/ /_/ /__/ /  __/ /_/ / /_/ /  __/ / / / /__/  __/
+    /_____/\___/\___/ .___/____/\___/\__, /\__,_/\___/_/ /_/\___/\___/
+                   /_/                 /_/
+
+DeepSequence is built with python2.7 and uses the Theano library for GPU and CPU
+acceleration. You can use an existing installation of python2.7 and install the
+necessary packages, but if this is not possible or you would like a fresh slate,
+we recommend using the Anaconda python package manager (using version 2.7):
+
+https://www.anaconda.com/download/#macos
+
+Once this is installed, Theano will need to be installed. The instructions can
+be found here:
+
+http://deeplearning.net/software/theano/install.html
+
+Theano can speed up both CPU and GPU functions used commonly in mathematical and
+deep learning frameworks. We recommend fitting models and predicting the effects
+of mutations with a GPU-enabled machine for orders of magnitude faster
+performance, but it is not required. Information for getting CUDA installed to
+use the GPU can be found at the above link, and will need to be installed from
+here:
+
+https://developer.nvidia.com/cuda-downloads

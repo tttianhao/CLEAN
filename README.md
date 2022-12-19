@@ -1,1 +1,1 @@
-python .\scripts\extract.py esm1b_t33_650M_UR50S ..\PENCiL\data\uniref10_test_split_0_curate.fasta ..\PENCiL\data\esm_data\ --include mean
+python .\scripts\extract.py esm1b_t33_650M_UR50S ..\PENCiL\data\uniref10_test_split_0_curate.fasta ..\PENCiL\data\esm_weights\ --include mean

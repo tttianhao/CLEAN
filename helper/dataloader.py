@@ -72,9 +72,9 @@ class Triplet_dataset_with_mine_EC(torch.utils.data.Dataset):
         anchor = random.choice(self.ec_id[anchor_ec])
         pos = random_positive(anchor, self.id_ec, self.ec_id)
         neg = mine_negative(anchor, self.id_ec, self.ec_id, self.mine_neg)
-        a = torch.load('./data/esm_data/' + anchor + '.pt')
-        p = torch.load('./data/esm_data/' + pos + '.pt')
-        n = torch.load('./data/esm_data/' + neg + '.pt')
+        a = torch.load('./data/esm_weights/' + anchor + '.pt')
+        p = torch.load('./data/esm_weights/' + pos + '.pt')
+        n = torch.load('./data/esm_weights/' + neg + '.pt')
         return format_esm(a), format_esm(p), format_esm(n)
 
 
@@ -97,17 +97,17 @@ class MultiPosNeg_dataset_with_mine_EC(torch.utils.data.Dataset):
     def __getitem__(self, index):
         anchor_ec = self.full_list[index]
         anchor = random.choice(self.ec_id[anchor_ec])
-        a = format_esm(torch.load('./data/esm_data/' +
+        a = format_esm(torch.load('./data/esm_weights/' +
                        anchor + '.pt')).unsqueeze(0)
         data = [a]
         for _ in range(self.n_pos):
             pos = random_positive(anchor, self.id_ec, self.ec_id)
-            p = format_esm(torch.load('./data/esm_data/' +
+            p = format_esm(torch.load('./data/esm_weights/' +
                            pos + '.pt')).unsqueeze(0)
             data.append(p)
         for _ in range(self.n_neg):
             neg = mine_negative(anchor, self.id_ec, self.ec_id, self.mine_neg)
-            n = format_esm(torch.load('./data/esm_data/' +
+            n = format_esm(torch.load('./data/esm_weights/' +
                            neg + '.pt')).unsqueeze(0)
             data.append(n)
         return torch.cat(data)

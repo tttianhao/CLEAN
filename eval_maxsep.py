@@ -71,14 +71,15 @@ def main():
                           use_max_grad=args.use_max_grad)
     # get preds and true labels
     pred_label = get_pred_labels(out_filename, pred_type='_maxsep')
+    pred_probs = get_pred_probs(out_filename, pred_type='_maxsep')
     true_label, all_label = get_true_labels('./data/'+args.test_data)
-    pre, rec, f1, roc, acc = get_eval_metrics(
-        pred_label, true_label, all_label)
+    pre, rec, f1, roc, acc = get_eval_metrics_new(
+        pred_label, pred_probs, true_label, all_label)
     print("############ EC calling results using maximum separation ############")
     print('-' * 75)
     print(f'>>> total samples: {len(true_label)} | total ec {len(all_label)} |\n'
           f'precision | recall | F1 | AUC | accuracy' )
-    print( f'{pre:.5} , {rec:.5} , {f1:.5} , {roc:.5} , {acc:.5}')
+    print( f'{pre:.5} , {rec:.5} , {f1:.5} , {roc:.7} , {acc:.5}')
     print('-' * 75)
     return
 

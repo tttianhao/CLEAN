@@ -36,7 +36,7 @@ def mask_sequences(single_id: list, csv_name: str, fasta_name: str) -> None:
                 output_fasta.write(seq + '\n')
 
 def convert_dict():
-    dir_path = '/home/tianhao/project/EC_pred/esm_data/'
+    dir_path = '/home/tianhao/project/EC_pred/esm_weights/'
     counter = 0
     for files in os.listdir(dir_path):
         counter += 1
@@ -59,7 +59,7 @@ def main():
             single_ec.add(ec)
     for id in id_ec.keys():
         for ec in id_ec[id]:
-            if ec in single_ec and not os.path.exists('./data/esm_data/' + id + '_2.pt'):
+            if ec in single_ec and not os.path.exists('./data/esm_weights/' + id + '_2.pt'):
                 single_id.add(id)
                 break
     print(len(single_id), len(single_ec))

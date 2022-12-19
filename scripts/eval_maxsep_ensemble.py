@@ -68,6 +68,7 @@ def main():
     # compute distance map
      
     count = 0
+    print("_______________________________________")
     #esm_train = torch.load('data/esm_train_100full.pt').to(device)
     esm_train = esm_embedding(ec_id_dict_train, device, dtype)
     # #torch.save(esm_train, 'data/esm_train_100full.pt')

@@ -6,8 +6,8 @@ from helper.distance_map import *
 from helper.evaluate import *
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import warnings
+ 
 
 
 def warn(*args, **kwargs):
@@ -62,7 +62,13 @@ def main():
         model.load_state_dict(checkpoint)
         model.eval()
     # compute distance map
-    emb_train = model(esm_embedding(ec_id_dict_train, device, dtype))
+    print("____________________________")
+    #emb_train = model(esm_embedding(ec_id_dict_train, device, dtype))
+    #torch.save(emb_train, '100_full.pt')
+
+    emb_train = torch.load('100_full.pt')
+    
+    
     emb_test = model_embedding_test(id_ec_test, model, device, dtype)
     eval_dist = get_dist_map_test(
         emb_train, emb_test, ec_id_dict_train, id_ec_test, device, dtype)

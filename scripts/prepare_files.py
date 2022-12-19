@@ -48,7 +48,7 @@ def make_fasta(fasta_name, out_file, csv_file):
     for lines in fasta.readlines():
         if lines[0] == '>':
             id = lines[1:].strip()
-            if not os.path.exists('/home/tianhao/project/EC_pred/esm_data/' + id + '.pt'):
+            if not os.path.exists('/home/tianhao/project/EC_pred/esm_weights/' + id + '.pt'):
                 to_be_embed.add(id)
     print(len(to_be_embed))
     for i, rows in enumerate(csvreader):
@@ -88,7 +88,7 @@ def make_csv(out_file, csv_file):
     counter = [0, 0]
     for i, rows in enumerate(csvreader):
         if i > 0:
-            if os.path.exists('/home/tianhao/project/EC_pred/esm_data/' + rows[0] + '.pt'):
+            if os.path.exists('/home/tianhao/project/EC_pred/esm_weights/' + rows[0] + '.pt'):
                 csvwriter.writerow(rows)
                 counter[int(rows[1])] += 1
         else:

@@ -89,7 +89,7 @@ def format_esm(a):
 
 
 def load_esm(lookup):
-    esm = format_esm(torch.load('./data/esm_data/' + lookup + '.pt'))
+    esm = format_esm(torch.load('./data/esm_weights/' + lookup + '.pt'))
     return esm.unsqueeze(0)
 
 
@@ -100,7 +100,7 @@ def esm_embedding(ec_id_dict, device, dtype):
     '''
     esm_emb = []
     # for ec in tqdm(list(ec_id_dict.keys())):
-    for ec in list(ec_id_dict.keys()):
+    for ec in tqdm(list(ec_id_dict.keys())):
         ids_for_query = list(ec_id_dict[ec])
         esm_to_cat = [load_esm(id) for id in ids_for_query]
         esm_emb = esm_emb + esm_to_cat
