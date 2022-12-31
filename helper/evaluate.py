@@ -47,6 +47,28 @@ def write_max_sep_choices(df, csv_name, first_grad=True, use_max_grad=False):
         csvwriter.writerow(ec)
     return
 
+def write_max_sep_choices_overprediction(
+    df, csv_name, first_grad=True, use_max_grad=False):
+    out_file = open(csv_name + '_maxsep.csv', 'w', newline='')
+    csvwriter = csv.writer(out_file, delimiter=',')
+    #all_test_EC = set()
+    for col in df.columns:
+        ec = []
+        smallest_10_dist_df = df[col].nsmallest(10)
+        dist_lst = list(smallest_10_dist_df)
+        max_sep_i = maximum_separation(dist_lst, first_grad, use_max_grad)
+        for i in range(max_sep_i+1):
+            EC_i = smallest_10_dist_df.index[i]
+            EC_removed_last = '.'.join((EC_i.split('.')[:3]) + ['-'])
+            dist_i = smallest_10_dist_df[i]
+            dist_str = "{:.4f}".format(dist_i)
+            #all_test_EC.add(EC_i)
+            ec.append('EC:' + str(EC_removed_last) + '/' + dist_str)
+        ec.insert(0, col)
+        csvwriter.writerow(ec)
+    return
+
+
 def write_max_sep_choices_new(df, csv_name, first_grad=True, use_max_grad=False):
     out_file = open(csv_name + '_maxsep.csv', 'w', newline='')
     csvwriter = csv.writer(out_file, delimiter=',')
