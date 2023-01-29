@@ -4,7 +4,8 @@ from src.CLEAN.model import LayerNormNet
 from src.CLEAN.distance_map import *
 from src.CLEAN.evaluate import *
 from src.CLEAN.dataloader import mine_hard_negative
-from src.CLEAN.infer import infer_maxsep, uncertainty
+from src.CLEAN.infer import infer_maxsep
+from src.CLEAN.uncertainty import get_dist
 from sklearn import mixture
 import matplotlib.pyplot as plt
 import numpy as np
@@ -28,7 +29,7 @@ for i in range(40):
 
     for ec in random.choices(list(ec_id_dict_train.keys()), k = 500):
 
-        distances, neg_distances = uncertainty(ec, train_data,
+        distances, neg_distances = get_dist(ec, train_data,
                 report_metrics=True, pretrained=True, neg_target = 100, negative = negative)
         all_distance.extend(neg_distances)
         all_distance.extend(distances)
