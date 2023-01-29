@@ -8,3 +8,4 @@ build/
 results/
 model/
 gmm_test/
+src/CLEAN/__pycache__/
