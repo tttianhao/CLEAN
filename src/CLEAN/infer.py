@@ -58,8 +58,10 @@ def infer_pvalue(train_data, test_data, p_value = 1e-5, nk_random = 20,
     # optionally report prediction precision/recall/...
     if report_metrics:
         pred_label = get_pred_labels(out_filename, pred_type='_pvalue')
+        pred_probs = get_pred_probs(out_filename, pred_type='_pvalue')
         true_label, all_label = get_true_labels('./data/' + test_data)
-        pre, rec, f1, roc, __annotations__ = get_eval_metrics(pred_label, true_label, all_label)
+        pre, rec, f1, roc, acc = get_eval_metrics(
+            pred_label, pred_probs, true_label, all_label)
         print(f'############ EC calling results using random '
         f'chosen {nk_random}k samples ############')
         print('-' * 75)
@@ -113,8 +115,10 @@ def infer_maxsep(train_data, test_data, report_metrics = False,
     write_max_sep_choices(eval_df, out_filename)
     if report_metrics:
         pred_label = get_pred_labels(out_filename, pred_type='_maxsep')
+        pred_probs = get_pred_probs(out_filename, pred_type='_maxsep')
         true_label, all_label = get_true_labels('./data/' + test_data)
-        pre, rec, f1, roc, _ = get_eval_metrics(pred_label, true_label, all_label)
+        pre, rec, f1, roc, acc = get_eval_metrics(
+            pred_label, pred_probs, true_label, all_label)
         print("############ EC calling results using maximum separation ############")
         print('-' * 75)
         print(f'>>> total samples: {len(true_label)} | total ec: {len(all_label)} \n'

@@ -7,3 +7,4 @@ esm/
 build/
 results/
 model/
+gmm_test/

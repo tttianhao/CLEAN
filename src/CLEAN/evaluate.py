@@ -214,6 +214,27 @@ def get_pred_labels(out_filename, pred_type="_maxsep"):
         pred_label.append(preds_ec_lst)
     return pred_label
 
+def get_pred_probs(out_filename, pred_type="_maxsep"):
+    file_name = out_filename+pred_type
+    result = open(file_name+'.csv', 'r')
+    csvreader = csv.reader(result, delimiter=',')
+    pred_probs = []
+    for row in csvreader:
+        preds_ec_lst = []
+        preds_with_dist = row[1:]
+        probs = torch.zeros(len(preds_with_dist))
+        count = 0
+        for pred_ec_dist in preds_with_dist:
+            # get EC number 3.5.2.6 from EC:3.5.2.6/10.8359
+            ec_i = float(pred_ec_dist.split(":")[1].split("/")[1])
+            probs[count] = ec_i
+            #preds_ec_lst.append(probs)
+            count += 1
+        # sigmoid of the negative distances 
+        probs = (1 - torch.exp(-1/probs)) / (1 + torch.exp(-1/probs))
+        probs = probs/torch.sum(probs)
+        pred_probs.append(probs)
+    return pred_probs
 
 def get_pred_labels_prc(out_filename, cutoff, pred_type="_maxsep"):
     file_name = out_filename+pred_type
@@ -232,20 +253,59 @@ def get_pred_labels_prc(out_filename, cutoff, pred_type="_maxsep"):
     return pred_label
 
 
-def get_eval_metrics(pred_label, true_label, all_label):
+# def get_eval_metrics(pred_label, true_label, all_label):
+#     mlb = MultiLabelBinarizer()
+#     mlb.fit([list(all_label)])
+#     n_test = len(pred_label)
+#     pred_m = np.zeros((n_test, len(mlb.classes_)))
+#     true_m = np.zeros((n_test, len(mlb.classes_)))
+#     for i in range(n_test):
+#         pred_m[i] = mlb.transform([pred_label[i]])
+#         true_m[i] = mlb.transform([true_label[i]])
+#     pre = precision_score(true_m, pred_m, average='weighted', zero_division=0)
+#     rec = recall_score(true_m, pred_m, average='weighted')
+#     f1 = f1_score(true_m, pred_m, average='weighted')
+#     roc = roc_auc_score(true_m, pred_m, average='weighted')
+#     acc = accuracy_score(true_m, pred_m)
+#     return pre, rec, f1, roc, acc
+
+def get_ec_pos_dict(mlb, true_label, pred_label):
+    ec_list = []
+    pos_list = []
+    for i in range(len(true_label)):
+        ec_list += list(mlb.inverse_transform(mlb.transform([true_label[i]]))[0])
+        pos_list += list(np.nonzero(mlb.transform([true_label[i]]))[1])
+    for i in range(len(pred_label)):
+        ec_list += list(mlb.inverse_transform(mlb.transform([pred_label[i]]))[0])
+        pos_list += list(np.nonzero(mlb.transform([pred_label[i]]))[1])
+    label_pos_dict = {}
+    for i in range(len(ec_list)):
+        ec, pos = ec_list[i], pos_list[i]
+        label_pos_dict[ec] = pos
+        
+    return label_pos_dict
+
+def get_eval_metrics(pred_label, pred_probs, true_label, all_label):
     mlb = MultiLabelBinarizer()
     mlb.fit([list(all_label)])
     n_test = len(pred_label)
     pred_m = np.zeros((n_test, len(mlb.classes_)))
     true_m = np.zeros((n_test, len(mlb.classes_)))
+    # for including probability
+    pred_m_auc = np.zeros((n_test, len(mlb.classes_)))
+    label_pos_dict = get_ec_pos_dict(mlb, true_label, pred_label)
     for i in range(n_test):
         pred_m[i] = mlb.transform([pred_label[i]])
         true_m[i] = mlb.transform([true_label[i]])
+         # fill in probabilities for prediction
+        labels, probs = pred_label[i], pred_probs[i]
+        for label, prob in zip(labels, probs):
+            if label in all_label:
+                pos = label_pos_dict[label]
+                pred_m_auc[i, pos] = prob
     pre = precision_score(true_m, pred_m, average='weighted', zero_division=0)
     rec = recall_score(true_m, pred_m, average='weighted')
     f1 = f1_score(true_m, pred_m, average='weighted')
-    roc = roc_auc_score(true_m, pred_m, average='weighted')
+    roc = roc_auc_score(true_m, pred_m_auc, average='weighted')
     acc = accuracy_score(true_m, pred_m)
     return pre, rec, f1, roc, acc
-
- 

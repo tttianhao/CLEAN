@@ -67,7 +67,7 @@ python
 >>> infer_pvalue(train_data, test_data, p_value=1e-5, nk_random=20, 
                   report_metrics=True, pretrained=True)
 ```
-This should produce following results:
+This should produce similar results (depending on the version of ESM-1b weights):
 ```
 The embedding sizes for train and test: torch.Size([241025, 128]) torch.Size([392, 128])
 Calculating eval distance map, between 392 test ids and 5242 train EC cluster centers
@@ -87,7 +87,7 @@ python
 >>> test_data = "new"
 >>> infer_maxsep(train_data, test_data, report_metrics=True, pretrained=True)
 ```
-This should produce following results:
+This should produce similar results (depending on the version of ESM-1b weights):
 ```
 The embedding sizes for train and test: torch.Size([241025, 128]) torch.Size([392, 128])
 Calculating eval distance map, between 392 test ids and 5242 train EC cluster centers

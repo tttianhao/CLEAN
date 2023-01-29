@@ -18,7 +18,7 @@ id_ec_train, ec_id_dict_train = get_ec_id_dict('./data/' + train_data + '.csv')
 
 counter = 0
 
-dist_map = pickle.load(open('./data/distance_map/uniref100_full.pkl', 'rb'))
+dist_map = pickle.load(open('./data/distance_map/split100.pkl', 'rb'))
 negative = mine_hard_negative(dist_map, 5)
 
 for i in range(40):
