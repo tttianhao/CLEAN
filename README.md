@@ -10,6 +10,9 @@ To use CLEAN to inference the EC number for any amino acid sequence, we included
 ## 1. Install
 ###  1.1 Requirements
 Python >= 3.6; PyTorch >= 1.11.0; CUDA >= 10.1
+
+Manuscript result was obtained using Python 3.10.4; PyTorch 1.11.0; CUDA 11.3
+
 ### 1.2 Procedures
 Install requirement and build CLEAN
 ```python
@@ -183,3 +186,9 @@ python ./train-supconH.py --training_data split10 --model_name split10_supconH -
 We fixed the number of positive to be 9, the number of positive to be 30 and temperature to be 0.1 in all of our experiments. We recommand using 25% less number of epochs compared to `triplet margin` loss on the same training data.
 
 Also notice that the outputing embedding for `SupCon-Hard` is `out_dim=256` while for `triplet margin` is `out_dim=128`. To infer with a CLEAN-supconH model, see notes in `src/CLEAN/infer.py` about rebuilding CLEAN.
+
+## 4. Confidence estimate using GMM
+To train an ensumlbe of GMM:
+```python
+python gmm.py
+```
