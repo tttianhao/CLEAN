@@ -133,16 +133,11 @@ IGEVTRESFDAGIAVNIRHQFFAAQAVMEDMKAANSGSIINLGSISWMLKNGGYPVYV
 MSKSAVQGLTRGLARDLGHFNIRVNTLVPGWVMTEKQKRLWLDDAGRRSIKEGQCIDA
 ELEPADLARMALFLAADDSRMITAQDIVVDGGWA
 ```
-Inference through following commands:
-```python
-from CLEAN.infer import infer_maxsep
-from CLEAN.utils import prepare_infer_fasta
-fasta_name = "query"
-train_data = "split100"
-prepare_infer_fasta(fasta_name) # for data/query.fasta
-# results at results/query_maxsep.csv
-infer_maxsep(train_data, fasta_name, report_metrics=False, pretrained=True)
+Inference through the following command in terminal:
 ```
+python CLEAN_infer_fasta.py --fasta_data query 
+```
+And the max-separation prediction will be stored in `results/query_maxsep.csv`.
 
 ## 3. Training
 We provide the scripts for CLEAN models with both `triplet margin` and `Supcon-Hard` losses. Supcon-Hard Loss samples multiple positives and negatives and performs better than Triplet Margin Loss small training datasets, however it takes longer time to train. 
