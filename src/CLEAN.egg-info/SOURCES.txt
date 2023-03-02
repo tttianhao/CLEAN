@@ -7,6 +7,7 @@ src/CLEAN/evaluate.py
 src/CLEAN/infer.py
 src/CLEAN/losses.py
 src/CLEAN/model.py
+src/CLEAN/uncertainty.py
 src/CLEAN/utils.py
 src/CLEAN.egg-info/PKG-INFO
 src/CLEAN.egg-info/SOURCES.txt
