@@ -23,7 +23,7 @@ We included pretrained weights for 70% and 100% splits, along with pre-evaluated
 conda create -n clean python==3.10.4
 conda activate clean
 pip install -r requirements.txt
-conda install pytorch cpuonly -c pytorch
+conda install pytorch cpuonly -c pytorch         #install GPU version for GPU support
 git clone https://github.com/facebookresearch/esm.git
 python build.py install
 mkdir data/esm_data
