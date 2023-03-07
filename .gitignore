@@ -1,7 +1,6 @@
 data/esm_data
 data/distance_map
 data/pretrained
-data/*.fasta
 dist/
 esm/
 build/

@@ -15,7 +15,24 @@ Python >= 3.6; PyTorch >= 1.11.0; CUDA >= 10.1
 
 Manuscript result was obtained using Python 3.10.4; PyTorch 1.11.0; CUDA 11.3
 
-### 1.2 Procedures
+### 1.2 Quickstart (CPU)
+
+We included pretrained weights for 70% and 100% splits, along with pre-evaluated embeddings for each EC cluster centers for fastest inference. Download, unzip [these files](https://drive.google.com/file/d/1zrEU-HPNV3wp7wLAx4KnuiVyD794Oboj/view?usp=sharing) and move to `data/pretrained`.
+
+```
+conda create -n clean python==3.10.4
+conda activate clean
+pip install -r requirements.txt
+conda install pytorch cpuonly -c pytorch
+git clone https://github.com/facebookresearch/esm.git
+python build.py install
+mkdir data/esm_data
+python CLEAN_infer_fasta.py --fasta_data price
+```
+
+result will be generated as `results/price_maxsep.csv`
+
+### 1.3 Procedures
 Install requirement and build CLEAN
 ```python
 pip install -r requirements.txt
@@ -46,8 +63,6 @@ python
 ## 2. Inference
 
 ### 2.1 Preparation 
-
-We included pretrained weights for 70% and 100% splits, along with pre-evaluated embeddings for each EC cluster centers for fastest inference. Download, unzip [these files](https://drive.google.com/file/d/1zrEU-HPNV3wp7wLAx4KnuiVyD794Oboj/view?usp=sharing) and move to `data/pretrained`.
 
 We offer two EC-calling inference algorithms: `max-separation` and `p-value`. `max-separation` consistently gives better precision and recall, but results from `p-value` can be controlled by adjusting `p_value` as a hyperparameter. 
 

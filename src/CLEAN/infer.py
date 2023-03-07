@@ -87,7 +87,7 @@ def infer_maxsep(train_data, test_data, report_metrics = False,
     
     if pretrained:
         try:
-            checkpoint = torch.load('./data/pretrained/'+ train_data +'.pth')
+            checkpoint = torch.load('./data/pretrained/'+ train_data +'.pth', map_location=device)
         except FileNotFoundError as error:
             raise Exception('No pretrained weights for this training data')
     else:
@@ -100,9 +100,9 @@ def infer_maxsep(train_data, test_data, report_metrics = False,
     model.eval()
     # load precomputed EC cluster center embeddings if possible
     if train_data == "split70":
-        emb_train = torch.load('./data/pretrained/70.pt')
+        emb_train = torch.load('./data/pretrained/70.pt', map_location=device)
     elif train_data == "split100":
-        emb_train = torch.load('./data/pretrained/100.pt')
+        emb_train = torch.load('./data/pretrained/100.pt', map_location=device)
     else:
         emb_train = model(esm_embedding(ec_id_dict_train, device, dtype))
         

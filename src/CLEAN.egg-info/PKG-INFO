@@ -3,7 +3,7 @@ Name: CLEAN
 Version: 0.1
 Summary: CLEAN: Enzyme Function Prediction using Contrastive Learning
 Home-page: https://github.com/tttianhao/CLEAN
-Author: Tianhao Yu, Haiyang Cui, Jianan Canal Li, Yunan Luo, Guangde Jiang, and Huimin Zhao
+Author: Tianhao Yu, Haiyang Cui, Jianan Canal Li, Yunan Luo, Huimin Zhao
 Project-URL: Bug Tracker, https://github.com/tttianhao/CLEAN
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: Apache-2.0 License
