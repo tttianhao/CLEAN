@@ -15,7 +15,7 @@ Python >= 3.6; PyTorch >= 1.11.0; CUDA >= 10.1
 
 Manuscript result was obtained using Python 3.10.4; PyTorch 1.11.0; CUDA 11.3
 
-### 1.2 Quickstart (CPU)
+### 1.2 Quickstart
 
 We included pretrained weights for 70% and 100% splits, along with pre-evaluated embeddings for each EC cluster centers for fastest inference. Download, unzip [these files](https://drive.google.com/file/d/1zrEU-HPNV3wp7wLAx4KnuiVyD794Oboj/view?usp=sharing) and move to `data/pretrained`.
 
