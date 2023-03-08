@@ -13,7 +13,7 @@ To use CLEAN to inference the EC number for any amino acid sequence, we included
 ###  1.1 Requirements
 Python >= 3.6; PyTorch >= 1.11.0; CUDA >= 10.1
 
-Manuscript result was obtained using Python 3.10.4; PyTorch 1.11.0; CUDA 11.3
+Manuscript result was obtained using Python 3.10.4; PyTorch 1.11.0; CUDA 11.3; fair-esm 1.0.2
 
 ### 1.2 Quickstart
 
