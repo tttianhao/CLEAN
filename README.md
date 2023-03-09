@@ -25,7 +25,7 @@ conda activate clean
 pip install -r requirements.txt
 ```
 ```
-conda install pytorch cpuonly -c pytorch (CPU)
+conda install pytorch==1.11.0 cpuonly -c pytorch (CPU)
 conda install pytorch==1.11.0 cudatoolkit=11.3 -c pytorch (GPU)
 ```
 ```

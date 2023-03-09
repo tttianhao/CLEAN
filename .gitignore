@@ -4,7 +4,6 @@ data/pretrained
 dist/
 esm/
 build/
-results/
 model/
 gmm_test/
 src/CLEAN/__pycache__/
