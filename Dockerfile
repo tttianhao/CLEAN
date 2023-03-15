@@ -9,6 +9,10 @@ RUN pip install --upgrade -r requirements.txt
 # Ubuntu installation of Pytorch
 RUN pip3 install torch --extra-index-url https://download.pytorch.org/whl/cpu
 
+RUN mkdir data/esm_data
+
+RUN mkdir data/pretrained
+
 # Download weights in data/pretrained
 RUN pip install gdown
 RUN gdown --id 1zrEU-HPNV3wp7wLAx4KnuiVyD794Oboj
