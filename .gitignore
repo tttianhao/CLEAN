@@ -7,3 +7,4 @@ build/
 model/
 gmm_test/
 src/CLEAN/__pycache__/
+.DS_STORE
