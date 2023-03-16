@@ -37,6 +37,23 @@ python CLEAN_infer_fasta.py --fasta_data price
 
 result will be generated as `results/price_maxsep.csv`
 
+### 1.2.1 Running in Docker (Validating run on Docker)
+1. Pull the Docker Image for AMD64 Architecture Ubuntu Machine from moleculemaker/clean-image-amd64
+```
+docker pull moleculemaker/clean-image-amd64
+```
+***Our current experiments have only been successful on Docker Containers running with > 12GB Memory***
+
+2. Running this library requires downloading huge weight files (around 7.3GB), so its better to pre-download the weight files and mount these while running the docker container. You can download these from:
+```
+curl -o esm1b_t33_650M_UR50S-contact-regression.pt https://dl.fbaipublicfiles.com/fair-esm/regression/esm1b_t33_650M_UR50S-contact-regression.pt
+curl -o esm1b_t33_650M_UR50S.pt https://dl.fbaipublicfiles.com/fair-esm/models/esm1b_t33_650M_UR50S.pt
+```
+3. From the directory having these weight files, we are now ready to run the docker image. During this run, we will mount the above downloaded weights on the Docker container, start the container, and run the CLEAN library for a file price.fasta (which is already packaged in the image). ***Support for running user provided files and fetching output file generated will be provided later.***
+```
+sudo docker run -it -v ./:/root/.cache/torch/hub/checkpoints moleculemaker/clean-image-amd64 /bin/bash -c 'echo Starting Execution && python $(pwd)/CLEAN_infer_fasta.py --fasta_data price'
+```
+
 ### 1.3 Procedures
 Install requirement and build CLEAN
 ```python
