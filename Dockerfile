@@ -23,8 +23,5 @@ RUN unzip CLEAN_pretrained.zip -d data/pretrained
 
 RUN python build.py install
 
-# Initialize the large weights
-# RUN python CLEAN_infer_fasta.py --fasta_data price
-
 COPY entrypoint.sh ./entrypoint.sh
 CMD ["./entrypoint.sh"]
