@@ -9,6 +9,8 @@ RUN pip install --upgrade -r requirements.txt
 # Ubuntu installation of Pytorch
 RUN pip3 install torch --extra-index-url https://download.pytorch.org/whl/cpu
 
+RUN git clone https://github.com/facebookresearch/esm
+
 RUN mkdir data/esm_data
 
 RUN mkdir data/pretrained
