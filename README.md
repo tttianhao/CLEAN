@@ -24,6 +24,8 @@ conda create -n clean python==3.10.4
 conda activate clean
 pip install -r requirements.txt
 ```
+Pytorch installation is different for different Operating systems, please refer [Pytorch Installation](https://pytorch.org/get-started/locally/). 
+
 ```
 conda install pytorch==1.11.0 cpuonly -c pytorch (CPU)
 conda install pytorch==1.11.0 cudatoolkit=11.3 -c pytorch (GPU)
