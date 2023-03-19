@@ -25,9 +25,6 @@ To use CLEAN to inference the EC number for any amino acid sequence, we included
 ### 1.1 Requirements
 
 Python >= 3.6; PyTorch >= 1.11.0; CUDA >= 10.1
-
-  
-
 Manuscript result was obtained using Python 3.10.4; PyTorch 1.11.0; CUDA 11.3; fair-esm 1.0.2
 
   
@@ -38,14 +35,12 @@ Manuscript result was obtained using Python 3.10.4; PyTorch 1.11.0; CUDA 11.3; f
 
 We included pretrained weights for 70% and 100% splits, along with pre-evaluated embeddings for each EC cluster centers for fastest inference. Download, unzip [these files](https://drive.google.com/file/d/1zrEU-HPNV3wp7wLAx4KnuiVyD794Oboj/view?usp=sharing) and move to `data/pretrained`.
 
-  
+The following commands have to run into the /app directory.
 
 ```
 
 conda create -n clean python==3.10.4
-
 conda activate clean
-
 pip install -r requirements.txt
 
 ```
@@ -57,7 +52,6 @@ Pytorch installation is different for different Operating systems, please refer 
 ```
 
 conda install pytorch==1.11.0 cpuonly -c pytorch (CPU)
-
 conda install pytorch==1.11.0 cudatoolkit=11.3 -c pytorch (GPU)
 
 ```
@@ -68,11 +62,8 @@ conda install pytorch==1.11.0 cudatoolkit=11.3 -c pytorch (GPU)
 ```
 
 git clone https://github.com/facebookresearch/esm.git
-
 python build.py install
-
 mkdir data/esm_data
-
 python CLEAN_infer_fasta.py --fasta_data price
 
 ```
@@ -124,9 +115,7 @@ Install requirement and build CLEAN
 ```python
 
 pip install -r requirements.txt
-
 git clone https://github.com/facebookresearch/esm.git
-
 python build.py install
 
 ```
