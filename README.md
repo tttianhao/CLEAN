@@ -74,7 +74,7 @@ result will be generated as `results/inputs/price_maxsep.csv`
 
   
 
-### 1.2.1 Running in Docker (Validating run on Docker)
+### 1.2.1 Running in Docker
 
 1. Pull the Docker Image for AMD64 Architecture Ubuntu Machine from moleculemaker/clean-image-amd64
 
