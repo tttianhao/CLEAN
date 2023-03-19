@@ -98,7 +98,7 @@ curl -o esm1b_t33_650M_UR50S.pt https://dl.fbaipublicfiles.com/fair-esm/models/e
 
 ```
 
-3. From the directory having these weight files, we are now ready to run the docker image. During this run, we will mount the above downloaded weights on the Docker container, start the container, and run the CLEAN library for a file price.fasta (which is already packaged in the image). ***Support for running user provided files and fetching output file generated will be provided later.***
+3. From the directory having these weight files, we are now ready to run the docker image. During this run, we will mount the above downloaded weights on the Docker container, start the container, and run the CLEAN library for a file price.fasta (which is already packaged in the image). If you wish to run this on your own FASTA file, you can copy it under /app/data/inputs directory. 
 
 ```
 
@@ -106,7 +106,7 @@ sudo docker run -it -v ./:/root/.cache/torch/hub/checkpoints moleculemaker/clean
 
 ```
 
-  
+The output file will be generated under results/inputs directory with the same name as the input file.   
 
 ### 1.3 Procedures
 
