@@ -4,7 +4,7 @@
 
 [![DOI](https://zenodo.org/badge/525112894.svg)](https://zenodo.org/badge/latestdoi/525112894)
 
-  
+CLEAN is converted into an easy-to-use webserver and made freely accessible at [MMLI tools](https://moleculemaker.org/alphasynthesis).
 
 This is the official repository for the paper *Enzyme Function Prediction using Contrastive Learning*. **CLEAN**, **Contrastive Learning enabled Enzyme ANnotation**, is a machine learning algorithm to assign Enzyme Commission (EC) number with better accuracy, reliability, and sensitivity than all existing computational tools.
 
@@ -31,14 +31,10 @@ Manuscript result was obtained using Python 3.10.4; PyTorch 1.11.0; CUDA 11.3; f
 
 ### 1.2 Quickstart
 
-  
-
-We included pretrained weights for 70% and 100% splits, along with pre-evaluated embeddings for each EC cluster centers for fastest inference. Download, unzip [these files](https://drive.google.com/file/d/1zrEU-HPNV3wp7wLAx4KnuiVyD794Oboj/view?usp=sharing) and move to `data/pretrained`.
-
-The following commands have to run into the /app directory.
 
 ```
 
+cd CLEAN/app/
 conda create -n clean python==3.10.4
 conda activate clean
 pip install -r requirements.txt
@@ -46,6 +42,7 @@ pip install -r requirements.txt
 ```
 
 Pytorch installation is different for different Operating systems, please refer [Pytorch Installation](https://pytorch.org/get-started/locally/).
+For Linux, please use the following commands.
 
   
 
@@ -56,7 +53,7 @@ conda install pytorch==1.11.0 cudatoolkit=11.3 -c pytorch (GPU)
 
 ```
 
-  The input FASTA file should be present in the data/inputs directory. We have provided 2 input sample files already in the codebase - price.fasta and init.fasta. 
+  The input FASTA file should be present in the data/inputs directory. We have provided 2 input sample files already in the codebase - price.fasta and init.fasta. We have also included pretrained weights for 70% and 100% splits, along with pre-evaluated embeddings for each EC cluster centers for fastest inference. Download, unzip [these files](https://drive.google.com/file/d/1zrEU-HPNV3wp7wLAx4KnuiVyD794Oboj/view?usp=sharing) and move the contains to `data/pretrained`.
   
 
 ```
