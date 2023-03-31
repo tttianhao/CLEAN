@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/525112894.svg)](https://zenodo.org/badge/latestdoi/525112894)
 
-This is the official repository for the paper *Enzyme Function Prediction using Contrastive Learning*. **CLEAN**, **Contrastive Learning enabled Enzyme ANnotation**, is a machine learning algorithm to assign Enzyme Commission (EC) number with better accuracy, reliability, and sensitivity than all existing computational tools. 
+This is the official repository for the paper *Enzyme Function Prediction using Contrastive Learning*. **CLEAN**, **Contrastive Learning enabled Enzyme ANnotation**, is a machine learning algorithm to assign Enzyme Commission (EC) number with better accuracy, reliability, and sensitivity than all existing computational tools. We also offer a [web server](https://clean.frontend.mmli1.ncsa.illinois.edu/configuration) for CLEAN as part of MMLI AlphaSynthesis tools. Please note that as an initial release, CLEAN web server uses default parameters to generate results. In the future, we will allow user customized parameters. In the meantime, to reproduce the results in our manuscript, please follow the following guide.
 
 To use CLEAN to inference the EC number for any amino acid sequence, we included the pretrained weights for both the 70% and 100% identity clustering split of SwissProt (expertly reviewed portion of the UniProt, total ~220k training data). User can follow the instruction below on how to install and inference with CLEAN. We also provide full training scripts.
 <p align="center">
