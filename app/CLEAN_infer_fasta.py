@@ -15,7 +15,7 @@ def eval_parse():
 def main():
     args = eval_parse()
     train_data = 'split100'
-    test_data = args.fasta_data
+    test_data = 'inputs/' + args.fasta_data 
     # converting fasta to dummy csv file, will delete after inference
     # esm embedding are taken care of
     prepare_infer_fasta(test_data) 
