@@ -1,4 +1,3 @@
-README.md
 build.py
 src/CLEAN/__init__.py
 src/CLEAN/dataloader.py

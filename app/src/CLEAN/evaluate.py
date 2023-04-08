@@ -1,4 +1,5 @@
 import csv
+import pickle
 from .utils import *
 from .distance_map import *
 from .evaluate import *
@@ -27,7 +28,7 @@ def maximum_separation(dist_lst, first_grad, use_max_grad):
     return max_sep_i
 
 
-def write_max_sep_choices(df, csv_name, first_grad=True, use_max_grad=False):
+def write_max_sep_choices(df, csv_name, first_grad=True, use_max_grad=False, gmm = None):
     out_file = open(csv_name + '_maxsep.csv', 'w', newline='')
     csvwriter = csv.writer(out_file, delimiter=',')
     all_test_EC = set()
@@ -39,6 +40,9 @@ def write_max_sep_choices(df, csv_name, first_grad=True, use_max_grad=False):
         for i in range(max_sep_i+1):
             EC_i = smallest_10_dist_df.index[i]
             dist_i = smallest_10_dist_df[i]
+            if gmm != None:
+                gmm_lst = pickle.load(open(gmm, 'rb'))
+                dist_i = infer_confidence_gmm(dist_i, gmm_lst)
             dist_str = "{:.4f}".format(dist_i)
             all_test_EC.add(EC_i)
             ec.append('EC:' + str(EC_i) + '/' + dist_str)
@@ -46,6 +50,15 @@ def write_max_sep_choices(df, csv_name, first_grad=True, use_max_grad=False):
         csvwriter.writerow(ec)
     return
 
+def infer_confidence_gmm(distance, gmm_lst):
+    confidence = []
+    for j in range(len(gmm_lst)):
+        main_GMM = gmm_lst[j]
+        a, b = main_GMM.means_
+        true_model_index = 0 if a[0] < b[0] else 1
+        certainty = main_GMM.predict_proba([[distance]])[0][true_model_index]
+        confidence.append(certainty)
+    return np.mean(confidence)
 
 def write_pvalue_choices(df, csv_name, random_nk_dist_map, p_value=1e-5):
     out_file = open(csv_name + '_pvalue.csv', 'w', newline='')

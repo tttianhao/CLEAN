@@ -21,7 +21,7 @@ def main():
     prepare_infer_fasta(test_data) 
     # inferred results is in
     # results/[args.fasta_data].csv
-    infer_maxsep(train_data, test_data, report_metrics=False, pretrained=True)
+    infer_maxsep(train_data, test_data, report_metrics=False, pretrained=True, gmm = './data/pretrained/gmm_ensumble.pkl')
     # removing dummy csv file
     os.remove("data/"+ test_data +'.csv')
     
