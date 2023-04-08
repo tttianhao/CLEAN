@@ -52,13 +52,13 @@ conda install pytorch==1.11.0 cudatoolkit=11.3 -c pytorch (GPU)
 
 ```
 
-  The input FASTA file should be present in the data/inputs directory. We have provided 2 input sample files already in the codebase - price.fasta and init.fasta. We have also included pretrained weights for 70% and 100% splits, along with pre-evaluated embeddings for each EC cluster centers for fastest inference. Download, unzip [these files](https://drive.google.com/file/d/1zrEU-HPNV3wp7wLAx4KnuiVyD794Oboj/view?usp=sharing) and move the contains to `data/pretrained`.
+  The input FASTA file should be present in the data/inputs directory. We have provided 2 input sample files already in the codebase - price.fasta and init.fasta. We have also included pretrained weights for 70% and 100% splits, along with pre-evaluated embeddings for each EC cluster centers for fastest inference. Download, unzip [these files](https://drive.google.com/file/d/1gsxjSf2CtXzgW1XsennTr-TcvSoTSDtk/view?usp=sharing) and move the contains to `data/pretrained`.
   
 
 ```
 
-git clone https://github.com/facebookresearch/esm.git
 python build.py install
+git clone https://github.com/facebookresearch/esm.git
 mkdir data/esm_data
 python CLEAN_infer_fasta.py --fasta_data price
 
@@ -70,7 +70,7 @@ result will be generated as `results/inputs/price_maxsep.csv`
 
   
 
-### 1.2.1 Running in Docker
+### 1.2.1 Running in Docker (CPU version)
 
 1. Pull the Docker Image for AMD64 Architecture Ubuntu Machine from moleculemaker/clean-image-amd64
 
