@@ -7,8 +7,7 @@ COPY app /app
 RUN pip3 install --upgrade -r requirements.txt
 
 # Ubuntu installation of Pytorch
-# RUN pip3 install torch --extra-index-url https://download.pytorch.org/whl/cpu
-RUN pip3 install torch
+RUN pip3 install torch --extra-index-url https://download.pytorch.org/whl/cpu
 
 RUN git clone https://github.com/facebookresearch/esm
 
