@@ -73,7 +73,7 @@ def infer_pvalue(train_data, test_data, p_value = 1e-5, nk_random = 20,
 
 
 def infer_maxsep(train_data, test_data, report_metrics = False, 
-                 pretrained=True, model_name=None):
+                 pretrained=True, model_name=None, gmm = None):
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda:0" if use_cuda else "cpu")
     dtype = torch.float32
@@ -112,7 +112,7 @@ def infer_maxsep(train_data, test_data, report_metrics = False,
     eval_df = pd.DataFrame.from_dict(eval_dist)
     ensure_dirs("./results")
     out_filename = "results/" +  test_data
-    write_max_sep_choices(eval_df, out_filename)
+    write_max_sep_choices(eval_df, out_filename, gmm=gmm)
     if report_metrics:
         pred_label = get_pred_labels(out_filename, pred_type='_maxsep')
         pred_probs = get_pred_probs(out_filename, pred_type='_maxsep')
