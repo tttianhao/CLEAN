@@ -1,6 +1,7 @@
 import csv
 import random
 import os
+import math
 from re import L
 import torch
 import numpy as np
@@ -143,5 +144,49 @@ def prepare_infer_fasta(fasta_name):
         if i[0] == '>':
             csvwriter.writerow([i.strip()[1:], ' ', ' '])
     
+def mutate(seq: str, position: int) -> str:
+    seql = seq[ : position]
+    seqr = seq[position+1 : ]
+    seq = seql + '*' + seqr
+    return seq
+
+def mask_sequences(single_id, csv_name, fasta_name) :
+    csv_file = open('./data/'+ csv_name + '.csv')
+    csvreader = csv.reader(csv_file, delimiter = '\t')
+    output_fasta = open('./data/' + fasta_name + '.fasta','w')
+    single_id = set(single_id)
+    for i, rows in enumerate(csvreader):
+        if rows[0] in single_id:
+            for j in range(10):
+                seq = rows[2].strip()
+                mu, sigma = .10, .02 # mean and standard deviation
+                s = np.random.normal(mu, sigma, 1)
+                mut_rate = s[0]
+                times = math.ceil(len(seq) * mut_rate)
+                for k in range(times):
+                    position = random.randint(1 , len(seq) - 1)
+                    seq = mutate(seq, position)
+                seq = seq.replace('*', '<mask>')
+                output_fasta.write('>' + rows[0] + '_' + str(j) + '\n')
+                output_fasta.write(seq + '\n')
+
+def mutate_single_seq_ECs(train_file):
+    id_ec, ec_id =  get_ec_id_dict('./data/' + train_file + '.csv')
+    single_ec = set()
+    for ec in ec_id.keys():
+        if len(ec_id[ec]) == 1:
+            single_ec.add(ec)
+    single_id = set()
+    for id in id_ec.keys():
+        for ec in id_ec[id]:
+            if ec in single_ec and not os.path.exists('./data/esm_data/' + id + '_1.pt'):
+                single_id.add(id)
+                break
+    print("Number of EC numbers with only one sequences:",len(single_ec))
+    print("Number of single-seq EC number sequences need to mutate: ",len(single_id))
+    print("Number of single-seq EC numbers already mutated: ", len(single_ec) - len(single_id))
+    mask_sequences(single_id, train_file, train_file+'_single_seq_ECs')
+    fasta_name = train_file+'_single_seq_ECs'
+    return fasta_name
 
 
