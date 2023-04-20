@@ -370,13 +370,29 @@ $$\mathcal{L}^{sup} = \sum_{e\in E} \frac{-1}{|P(e)|}\sum_{z_p \in P(e)}\log  \f
 
 where a fixed number of positives are sampled from the same EC class as the anchor, and a fixed number of negatives are hard-mined.
 
-  
-
-To speed up training, the pair-wise distance matrix and embedding matrix need to be pre-computed. **This only needs to be done ONCE for every training file!**. Run following commands:
+Before training, a required step is to mutate the sequences with 'orphan' EC number ('orphan' in the way this EC number has only one sequence). Since we need to sample positive sequences other than the anchor sequence, we mutated the anchor sequence and use the mutated sequences as positive sequences. **This only needs to be done ONCE for every training file!**. Run following commands:  
 
 ```python
 
 python
+
+>>> from CLEAN.utils import mutate_single_seq_ECs, retrive_esm1b_embedding
+
+>>> train_file = "split10"
+
+>>> train_fasta_file = mutate_single_seq_ECs(train_file)
+
+>>> retrive_esm1b_embedding(train_fasta_file)
+
+```
+
+Next, to speed up training, the pair-wise distance matrix and embedding matrix need to be pre-computed. **This only also only needs to be done ONCE for every training file!**. Run following commands:
+
+```python
+
+python
+
+>>> from CLEAN.utils import compute_esm_distance
 
 >>> train_file = "split10"
 
