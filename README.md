@@ -34,7 +34,7 @@ Manuscript result was obtained using Python 3.10.4; PyTorch 1.11.0; CUDA 11.3; f
 ```
 
 cd CLEAN/app/
-conda create -n clean python==3.10.4
+conda create -n clean python==3.10.4 -y
 conda activate clean
 pip install -r requirements.txt
 
