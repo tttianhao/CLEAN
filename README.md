@@ -20,16 +20,16 @@ To use CLEAN to inference the EC number for any amino acid sequence, we included
 
 If you find CLEAN helpful in your research, please consider citing us:
 
-    @misc{doi:10.1126/science.adf2465,
-    author = {Tianhao Yu  and Haiyang Cui  and Jianan Canal Li  and Yunan Luo  and Guangde Jiang  and Huimin Zhao },
-    title = {Enzyme function prediction using contrastive learning},
-    journal = {Science},
-    volume = {379},
-    number = {6639},
-    pages = {1358-1363},
-    year = {2023},
-    doi = {10.1126/science.adf2465},
-    URL = {https://www.science.org/doi/abs/10.1126/science.adf2465}
+    @article{doi:10.1126/science.adf2465,
+      author = {Tianhao Yu  and Haiyang Cui  and Jianan Canal Li  and Yunan Luo  and Guangde Jiang  and Huimin Zhao },
+      title = {Enzyme function prediction using contrastive learning},
+      journal = {Science},
+      volume = {379},
+      number = {6639},
+      pages = {1358-1363},
+      year = {2023},
+      doi = {10.1126/science.adf2465},
+      URL = {https://www.science.org/doi/abs/10.1126/science.adf2465}
     }  
 
 
