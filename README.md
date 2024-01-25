@@ -66,8 +66,10 @@ conda install pytorch==1.11.0 cudatoolkit=11.3 -c pytorch (GPU)
 
 ```
 
-  The input FASTA file should be present in the data/inputs directory. We have provided 2 input sample files already in the codebase - price.fasta and init.fasta. We have also included pretrained weights for 70% and 100% splits, along with pre-evaluated embeddings for each EC cluster centers for fastest inference. Download, unzip [these files](https://drive.google.com/file/d/1gsxjSf2CtXzgW1XsennTr-TcvSoTSDtk/view?usp=sharing) and move the contains to `data/pretrained`.
-  
+  The input FASTA file should be present in the data/inputs directory. We have provided 2 input sample files already in the codebase - price.fasta and init.fasta. We have also included pretrained weights for 70% and 100% splits, along with pre-evaluated embeddings for each EC cluster centers for fastest inference. Download, unzip [these files](https://drive.google.com/file/d/1kwYd4VtzYuMvJMWXy6Vks91DSUAOcKpZ/view?usp=sharing) and move the contains to `data/pretrained`.
+
+  Due to frequent requests, we are also releasing the train/test sets (5 folds for each of the split10/30/50/70/100) used in the paper. Please download from the [following link](https://drive.google.com/file/d/1MzYQ--CRK253eAKOmZrD1nzF-mXHfXtq/view?usp=sharing). As described in Supplementary Text 1. ML model development and evaluation, we are reporting results averaged across 5 folds, we didn't create additional validation sets, and interested users can create the validation sets following a similar procedure for creating train/test sets. Note that these cross-validation splits are from when developing CLEAN, and are not completely equal to the full split10/30/50/70/100 released in the repo. 
+
 
 ```
 
