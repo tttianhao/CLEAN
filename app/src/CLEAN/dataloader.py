@@ -1,28 +1,26 @@
 import torch
 import random
 from .utils import format_esm
+from tqdm import tqdm
 
+def find_first_non_zero_distance(data):
+    for index, (name, distance) in enumerate(data):
+        if distance != 0:
+            return index
+    return None 
 
 def mine_hard_negative(dist_map, knn=10):
     #print("The number of unique EC numbers: ", len(dist_map.keys()))
     ecs = list(dist_map.keys())
     negative = {}
-    for i, target in enumerate(ecs):
-        sort_orders = sorted(
-            dist_map[target].items(), key=lambda x: x[1], reverse=False)
-        if sort_orders[1][1] != 0:
-            freq = [1/i[1] for i in sort_orders[1:1 + knn]]
-            neg_ecs = [i[0] for i in sort_orders[1:1 + knn]]
-        elif sort_orders[2][1] != 0:
-            freq = [1/i[1] for i in sort_orders[2:2+knn]]
-            neg_ecs = [i[0] for i in sort_orders[2:2+knn]]
-        elif sort_orders[3][1] != 0:
-            freq = [1/i[1] for i in sort_orders[3:3+knn]]
-            neg_ecs = [i[0] for i in sort_orders[3:3+knn]]
-        else:
-            freq = [1/i[1] for i in sort_orders[4:4+knn]]
-            neg_ecs = [i[0] for i in sort_orders[4:4+knn]]
-
+    print("Mining hard negatives:")
+    for _, target in tqdm(enumerate(ecs), total=len(ecs)):
+        sorted_orders = sorted(dist_map[target].items(), key=lambda x: x[1], reverse=False)
+        assert sorted_orders != None, "all clusters have zero distances!"
+        neg_ecs_start_index = find_first_non_zero_distance(sorted_orders)
+        closest_negatives = sorted_orders[neg_ecs_start_index:neg_ecs_start_index + knn]
+        freq = [1/i[1] for i in closest_negatives]
+        neg_ecs = [i[0] for i in closest_negatives]        
         normalized_freq = [i/sum(freq) for i in freq]
         negative[target] = {
             'weights': normalized_freq,
