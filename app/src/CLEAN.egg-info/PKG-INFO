@@ -1,4 +1,4 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.2
 Name: CLEAN
 Version: 0.1
 Summary: CLEAN: Enzyme Function Prediction using Contrastive Learning
@@ -9,3 +9,9 @@ Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: Apache-2.0 License
 Classifier: Operating System :: OS Independent
 Requires-Python: >=3.6
+Dynamic: author
+Dynamic: classifier
+Dynamic: home-page
+Dynamic: project-url
+Dynamic: requires-python
+Dynamic: summary
